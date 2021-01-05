@@ -1,0 +1,14 @@
+export const GET_PODCASTS = 'GET_PODCASTS';
+export const GET_PODCASTS_STARTED = 'GET_PODCASTS_STARTED';
+export const PODCASTS_ERROR = 'PODCASTS_ERROR';
+
+export const GET_PROFILE = 'GET_PROFILE';
+export const GET_PROFILE_STARTED = 'GET_PROFILE_STARTED';
+export const PROFILE_ERROR = 'PROFILE_ERROR';
+
+export const LOGIN_STARTED = 'LOGIN_STARTED';
+export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
+export const LOGIN_REQUIRED = 'LOGIN_REQUIRED';
+export const LOGIN_FAILED = 'LOGIN_FAILED';
+export const LOGGEDIN = 'LOGGEDIN';
+export const LOGOUT = 'LOGOUT';
