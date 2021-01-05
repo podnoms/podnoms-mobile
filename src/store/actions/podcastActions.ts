@@ -15,7 +15,6 @@ const getPodcasts = () => {
                 }),
             );
             const res = await service.getPodcasts();
-            log.debug('podcastActions', 'getPodcasts', res);
 
             dispatch({
                 type: GET_PODCASTS,

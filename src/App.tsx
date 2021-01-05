@@ -1,15 +1,18 @@
-import React, { useEffect } from 'react';
+import React from 'react';
+
+import {useEffect, useContext, useMemo, useState} from 'react';
 import {Provider as StoreProvider, useSelector, useDispatch} from 'react-redux';
 import {Provider as PaperProvider} from 'react-native-paper';
 
 import CustomDarkTheme from './themes/customDarkTheme';
 import CustomDefaultTheme from './themes/CustomDefaultTheme';
-import LoginStackScreen from './services/navigation/LoginStack';
+import LoginStackScreen from './navigation/LoginStack';
 import store from './store';
 import {NavigationContainer} from '@react-navigation/native';
-import AppStackScreen from './services/navigation/AppStack';
+import AppStackScreen from './navigation/AppStack';
 import ThemeContext from './themes/themeContext';
 import {loginActions} from './store/actions/loginActions';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function AppWrapper() {
     return (
@@ -23,20 +26,37 @@ function App() {
     const loginState = useSelector((state) => state.loginState);
     const dispatch = useDispatch();
 
-    const [isDarkTheme, setIsDarkTheme] = React.useState(false);
+    const [isDarkTheme, setIsDarkTheme] = useState(false);
     const theme = isDarkTheme ? CustomDarkTheme : CustomDefaultTheme;
+    const {toggleTheme} = useContext(ThemeContext);
 
     useEffect(() => {
         dispatch(loginActions.loginCheckStatus());
     }, [dispatch]);
 
-    const themeContext = React.useMemo(
+    useEffect(() => {
+        async function loadTheme() {
+            const theme = await AsyncStorage.getItem('isdark');
+            console.log('App', 'loadingTheme', theme);
+            if (JSON.parse(theme || 'false')) {
+                setIsDarkTheme(true);
+            }
+        }
+        loadTheme();
+    }, [isDarkTheme]);
+
+    const themeContext = useMemo(
         () => ({
-            toggleTheme: () => {
+            loadTheme: async () => {},
+            toggleTheme: async () => {
+                await AsyncStorage.setItem(
+                    'isdark',
+                    JSON.stringify(!isDarkTheme),
+                );
                 setIsDarkTheme((isDarkTheme) => !isDarkTheme);
             },
         }),
-        [],
+        [isDarkTheme],
     );
 
     const renderInner = () => {
@@ -58,4 +78,5 @@ function App() {
         </PaperProvider>
     );
 }
+
 export default AppWrapper;

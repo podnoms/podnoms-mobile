@@ -12,14 +12,17 @@ import {Switch} from 'react-native-paper';
 import {DrawerContentScrollView, DrawerItem} from '@react-navigation/drawer';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {loginActions} from '../../store/actions/loginActions';
 import ThemeContext from '../../themes/themeContext';
 
 export function DrawerContent(props) {
     const paperTheme = useTheme();
     const dispatch = useDispatch();
-    const {toggleTheme} = React.useContext(ThemeContext);
+
+    const {loading, profile} = useSelector((state) => state.profileState);
+    console.log('Drawer', 'Profile', profile);
+    const {toggleTheme} = useContext(ThemeContext);
     const signOut = () => {
         dispatch(loginActions.logoutUser());
     };
@@ -31,7 +34,7 @@ export function DrawerContent(props) {
                         <View style={{flexDirection: 'row', marginTop: 15}}>
                             <Avatar.Image
                                 source={{
-                                    uri: 'http://placebeard.it/640/480',
+                                    uri: profile.thumbnailImageUrl,
                                 }}
                                 size={50}
                             />
@@ -40,7 +43,9 @@ export function DrawerContent(props) {
                                     marginLeft: 15,
                                     flexDirection: 'column',
                                 }}>
-                                <Title style={styles.title}>John Doe</Title>
+                                <Title style={styles.title}>
+                                    {profile.name}
+                                </Title>
                                 <Caption style={styles.caption}>@j_doe</Caption>
                             </View>
                         </View>
@@ -49,19 +54,19 @@ export function DrawerContent(props) {
                             <View style={styles.section}>
                                 <Paragraph
                                     style={[styles.paragraph, styles.caption]}>
-                                    80
+                                    {profile.podcastCount}
                                 </Paragraph>
                                 <Caption style={styles.caption}>
-                                    Following
+                                    Podcasts
                                 </Caption>
                             </View>
                             <View style={styles.section}>
                                 <Paragraph
                                     style={[styles.paragraph, styles.caption]}>
-                                    100
+                                    {profile.episodeCount}
                                 </Paragraph>
                                 <Caption style={styles.caption}>
-                                    Followers
+                                    Episodes
                                 </Caption>
                             </View>
                         </View>

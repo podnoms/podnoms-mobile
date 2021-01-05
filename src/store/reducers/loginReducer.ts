@@ -25,7 +25,7 @@ export default function (prevState = initialState, action) {
             };
         case LOGIN_SUCCESS:
         case LOGIN_INIT_SUCCESS:
-            log.debug('loginReducer', action.type, prevState, action.user);
+            log.debug('loginReducer', action.type, prevState, action.user.name);
             return {
                 ...prevState,
                 user: action.user,

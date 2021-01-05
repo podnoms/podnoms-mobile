@@ -33,7 +33,9 @@ const PodcastListScreen = ({props}) => {
                     <List.Item
                         key={p.id}
                         title={p.publicTitle}
-                        description={`${p.strippedDescription}\n${p.createDate}`}
+                        description={`${p.strippedDescription || ''}\n${
+                            p.createDate
+                        }`}
                         left={() => (
                             <Avatar.Image source={{uri: p.thumbnailUrl}} />
                         )}

@@ -17,12 +17,10 @@ import FontAwesome from 'react-native-vector-icons/dist/FontAwesome';
 import Feather from 'react-native-vector-icons/dist/Feather';
 import {useDispatch} from 'react-redux';
 
-
 import {useTheme} from 'react-native-paper';
 
 import LoginService from '../../services/api/loginService';
 import {loginActions} from '../../store/actions/loginActions';
-
 
 const LoginScreen = ({navigation: {navigate}}) => {
     const [data, setData] = useState({
@@ -95,7 +93,6 @@ const LoginScreen = ({navigation: {navigate}}) => {
     };
 
     const loginHandle = async (userName: string, password: string) => {
-        log.debug('Login', 'loginHandle', userName, password);
         if (data.username.length === 0 || data.password.length === 0) {
             Alert.alert(
                 'Wrong Input!',
@@ -227,7 +224,6 @@ const LoginScreen = ({navigation: {navigate}}) => {
                     <TouchableOpacity
                         style={styles.signIn}
                         onPress={() => {
-                            log.debug('Login', 'formSubmitted', data);
                             loginHandle(data.username, data.password);
                         }}>
                         <LinearGradient

@@ -6041,6 +6041,11 @@ react-native-devsettings-android@^0.4.0:
   resolved "https://registry.yarnpkg.com/react-native-devsettings-android/-/react-native-devsettings-android-0.4.0.tgz#9426e6364685623b86fc60e1b4e499e1526db861"
   integrity sha512-nPmn8XsThjimGiiMZhIJ+wFeLALzbv6cT/ESPM7kefRkl4xzgBhjjQRs86Ri2D3UJROcjUrBm2CI3DgWyGW9QA==
 
+react-native-flipper@^0.69.0:
+  version "0.69.0"
+  resolved "https://registry.yarnpkg.com/react-native-flipper/-/react-native-flipper-0.69.0.tgz#6e0ff2d1c91da49bf5536c9ad6cd2980f9e5d0f7"
+  integrity sha512-5ZqlNWCd5+h9G309sQiV/uSogATM3y2RRblsF8Lyx2NexmISeTYv8/oGxtBvq89Kysit8ZY1wExyF9laT4wx6w==
+
 react-native-gesture-handler@~1.9.0:
   version "1.9.0"
   resolved "https://registry.yarnpkg.com/react-native-gesture-handler/-/react-native-gesture-handler-1.9.0.tgz#e441b1c0277c3fd4ca3e5c58fdd681e2f0ceddf0"

@@ -1,10 +1,9 @@
-import React from "react";
+import React from 'react';
 
-import { createStackNavigator } from "@react-navigation/stack";
-import SplashScreen from "../../pages/login/Splash";
-import LoginScreen from "../../pages/login/Login";
-import DebugScreen from "../../pages/Debug";
-
+import {createStackNavigator} from '@react-navigation/stack';
+import SplashScreen from '../pages/login/Splash';
+import LoginScreen from '../pages/login/Login';
+import DebugScreen from '../pages/Debug';
 
 const LoginStack = createStackNavigator();
 

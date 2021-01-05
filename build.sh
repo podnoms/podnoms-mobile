@@ -14,5 +14,5 @@ npx react-native bundle \
     --bundle-output android/app/src/main/assets/index.android.bundle \
     --assets-dest android/app/src/main/res/
 
-echo "Creasting release"
+echo "Creating release"
 cd android && ./gradlew assembleRelease

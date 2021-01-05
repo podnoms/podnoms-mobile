@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {createStackNavigator} from '@react-navigation/stack';
-import SharingScreen from '../../pages/sharing/Sharing';
+import SharingScreen from '../pages/sharing/Sharing';
 
 const SharingStack = createStackNavigator();
 
