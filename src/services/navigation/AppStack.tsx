@@ -1,19 +1,14 @@
-import React from "react";
+import React from 'react';
 
-import { createStackNavigator } from "@react-navigation/stack";
+import {createStackNavigator} from '@react-navigation/stack';
+import DefaultAppScreen from '../../pages/app/DefaultAppScreen';
 
-import LoginScreen from "../../pages/login/Login";
-import SplashScreen from "../../pages/login/Splash";
-import DebugScreen from "../../pages/Debug";
+const AppStack = createStackNavigator();
 
-const LoginStack = createStackNavigator();
-
-const LoginStackScreen = () => (
-    <LoginStack.Navigator headerMode="none">
-        <LoginStack.Screen name="Splash" component={SplashScreen} />
-        <LoginStack.Screen name="Login" component={LoginScreen} />
-        <LoginStack.Screen name="Debug" component={DebugScreen} />
-    </LoginStack.Navigator>
+const AppStackScreen = () => (
+    <AppStack.Navigator headerMode="none">
+        <AppStack.Screen name="DefaultApp" component={DefaultAppScreen} />
+    </AppStack.Navigator>
 );
 
-export default LoginStackScreen;
+export default AppStackScreen;

@@ -11,4 +11,6 @@ export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const LOGIN_REQUIRED = 'LOGIN_REQUIRED';
 export const LOGIN_FAILED = 'LOGIN_FAILED';
 export const LOGGEDIN = 'LOGGEDIN';
-export const LOGOUT = 'LOGOUT';
+export const LOGOUT_STARTED = 'LOGOUT_STARTED';
+export const LOGOUT_COMPLETE = 'LOGOUT_COMPLETE';
+export const LOGOUT_FAILED = 'LOGOUT_FAILED';

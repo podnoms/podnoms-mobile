@@ -11,10 +11,11 @@ const isHermes = () => !!global.HermesInternal;
 
 import {logger} from 'react-native-logs';
 var log = logger.createLogger();
+log.debug('Bootstrapping application');
 
 if (__DEV__) {
     log.debug('index.js', 'Setting up dev tools');
-    startNetworkLogging(),
+    startNetworkLogging();
     NativeModules.DevSettings.setIsDebuggingRemotely(true);
 } else {
     log.debug('index.js', 'Disabling logging');

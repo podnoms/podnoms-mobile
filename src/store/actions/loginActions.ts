@@ -1,6 +1,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoginService from '../../services/api/loginService';
-import {LOGIN_STARTED, LOGIN_SUCCESS, LOGIN_FAILED, LOGGEDIN} from '../types';
+import {
+    LOGIN_STARTED,
+    LOGIN_SUCCESS,
+    LOGIN_FAILED,
+    LOGGEDIN,
+    LOGOUT_COMPLETE,
+    LOGOUT_STARTED,
+    LOGOUT_FAILED,
+} from '../types';
 
 const loginUser = (username: string, password: string) => {
     const service = new LoginService();
@@ -12,7 +20,7 @@ const loginUser = (username: string, password: string) => {
             dispatch({type: LOGGEDIN, user: res});
             dispatch(success(res));
         } catch (err) {
-            dispatch(failure(username));
+            dispatch(failure(err));
         }
     };
     function request(user) {
@@ -26,6 +34,27 @@ const loginUser = (username: string, password: string) => {
     }
 };
 
+const logoutUser = () => {
+    return async function (dispatch: any, getState: any) {
+        try {
+            dispatch(request());
+            await AsyncStorage.removeItem('user');
+            dispatch(success());
+        } catch (err) {
+            dispatch(failure(err));
+        }
+    };
+    function request() {
+        return {type: LOGOUT_STARTED};
+    }
+    function success() {
+        return {type: LOGOUT_COMPLETE};
+    }
+    function failure(error) {
+        return {type: LOGOUT_FAILED, error};
+    }
+};
 export const loginActions = {
     loginUser,
+    logoutUser,
 };
