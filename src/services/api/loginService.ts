@@ -24,6 +24,26 @@ class LoginService extends ApiService {
         }
         return null;
     };
+
+    refreshToken = async (accessToken: string, refreshToken: string) => {
+        log.debug('loginService', 'refreshToken');
+
+        const client = await this.requestClient();
+        const payload = {
+            accessToken: accessToken,
+            refreshToken: refreshToken,
+        };
+        try {
+            const response = await client.post('/auth/refreshtoken', payload);
+
+            if (response && response.status === 200) {
+                return UserToken.fromJson(response.data);
+            }
+        } catch (err) {
+            console.error('Exception validating user', err);
+        }
+        return null;
+    };
 }
 
 export default LoginService;

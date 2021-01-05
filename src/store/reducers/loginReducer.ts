@@ -1,4 +1,11 @@
-import { LOGIN_STARTED, LOGIN_REQUIRED, LOGGEDIN, LOGOUT_COMPLETE, LOGIN_SUCCESS} from '../types';
+import {
+    LOGIN_STARTED,
+    LOGIN_REQUIRED,
+    LOGIN_INIT_SUCCESS,
+    LOGGEDIN,
+    LOGOUT_COMPLETE,
+    LOGIN_SUCCESS,
+} from '../types';
 import {logger} from 'react-native-logs';
 var log = logger.createLogger();
 
@@ -17,7 +24,8 @@ export default function (prevState = initialState, action) {
                 isLoading: true,
             };
         case LOGIN_SUCCESS:
-            log.debug('loginReducer', LOGIN_SUCCESS, prevState);
+        case LOGIN_INIT_SUCCESS:
+            log.debug('loginReducer', action.type, prevState, action.user);
             return {
                 ...prevState,
                 user: action.user,

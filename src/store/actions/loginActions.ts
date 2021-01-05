@@ -1,6 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import User from '../../model/User';
 import LoginService from '../../services/api/loginService';
 import {
+    LOGIN_INIT_STARTED,
+    LOGIN_INIT_SUCCESS,
+    LOGIN_INIT_FAILED,
     LOGIN_STARTED,
     LOGIN_SUCCESS,
     LOGIN_FAILED,
@@ -10,6 +14,43 @@ import {
     LOGOUT_FAILED,
 } from '../types';
 
+const loginCheckStatus = () => {
+    const service = new LoginService();
+    return async function (dispatch: any, getState: any) {
+        console.log('loginActions', 'loginCheckStatus');
+        try {
+            dispatch(request());
+            const t = await AsyncStorage.getItem('user');
+            const stored = User.fromStorage(JSON.parse(t));
+            console.log('loginActions', 'loginCheckStatus-stored', stored);
+            if (stored) {
+                const user = await service.refreshToken(
+                    stored?.token,
+                    stored?.refreshToken,
+                );
+                console.log('loginActions', 'loginCheckStatus-refresh', user);
+                if (user) {
+                    dispatch(success(user));
+                }
+            } else {
+                console.log('loginActions', 'No user stored');
+            }
+        } catch (err) {
+            console.log('loginActions', 'Error refreshing tokens', err);
+            dispatch(failure(err));
+        }
+    };
+    function request() {
+        return {type: LOGIN_INIT_STARTED};
+    }
+    function success(user) {
+        return {type: LOGIN_INIT_SUCCESS, user};
+    }
+    function failure(error) {
+        return {type: LOGIN_INIT_FAILED, error};
+    }
+};
+
 const loginUser = (username: string, password: string) => {
     const service = new LoginService();
     return async function (dispatch: any, getState: any) {
@@ -17,6 +58,11 @@ const loginUser = (username: string, password: string) => {
             dispatch(request(username));
             const res = await service.loginUser(username, password);
             await AsyncStorage.setItem('user', JSON.stringify(res));
+            console.log(
+                'loginActions',
+                'Stored user',
+                await AsyncStorage.getItem('user'),
+            );
             dispatch({type: LOGGEDIN, user: res});
             dispatch(success(res));
         } catch (err) {
@@ -55,6 +101,7 @@ const logoutUser = () => {
     }
 };
 export const loginActions = {
+    loginCheckStatus,
     loginUser,
     logoutUser,
 };

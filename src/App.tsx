@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {Provider as StoreProvider, useSelector} from 'react-redux';
+import React, { useEffect } from 'react';
+import {Provider as StoreProvider, useSelector, useDispatch} from 'react-redux';
 import {Provider as PaperProvider} from 'react-native-paper';
 
 import CustomDarkTheme from './themes/customDarkTheme';
@@ -9,6 +9,7 @@ import store from './store';
 import {NavigationContainer} from '@react-navigation/native';
 import AppStackScreen from './services/navigation/AppStack';
 import ThemeContext from './themes/themeContext';
+import {loginActions} from './store/actions/loginActions';
 
 function AppWrapper() {
     return (
@@ -20,9 +21,14 @@ function AppWrapper() {
 
 function App() {
     const loginState = useSelector((state) => state.loginState);
+    const dispatch = useDispatch();
 
     const [isDarkTheme, setIsDarkTheme] = React.useState(false);
     const theme = isDarkTheme ? CustomDarkTheme : CustomDefaultTheme;
+
+    useEffect(() => {
+        dispatch(loginActions.loginCheckStatus());
+    }, [dispatch]);
 
     const themeContext = React.useMemo(
         () => ({
