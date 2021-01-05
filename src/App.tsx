@@ -8,6 +8,7 @@ import LoginStackScreen from './services/navigation/LoginStack';
 import store from './store';
 import {NavigationContainer} from '@react-navigation/native';
 import AppStackScreen from './services/navigation/AppStack';
+import ThemeContext from './themes/themeContext';
 
 function AppWrapper() {
     return (
@@ -18,10 +19,19 @@ function AppWrapper() {
 }
 
 function App() {
-    const [isDarkTheme] = useState(false);
+    const loginState = useSelector((state) => state.loginState);
+
+    const [isDarkTheme, setIsDarkTheme] = React.useState(false);
     const theme = isDarkTheme ? CustomDarkTheme : CustomDefaultTheme;
 
-    const loginState = useSelector((state) => state.loginState);
+    const themeContext = React.useMemo(
+        () => ({
+            toggleTheme: () => {
+                setIsDarkTheme((isDarkTheme) => !isDarkTheme);
+            },
+        }),
+        [],
+    );
 
     const renderInner = () => {
         if (loginState.isLoggedIn) {
@@ -34,9 +44,11 @@ function App() {
     };
     return (
         <PaperProvider theme={theme}>
-            <NavigationContainer theme={theme}>
-                {renderInner()}
-            </NavigationContainer>
+            <ThemeContext.Provider value={themeContext}>
+                <NavigationContainer theme={theme}>
+                    {renderInner()}
+                </NavigationContainer>
+            </ThemeContext.Provider>
         </PaperProvider>
     );
 }

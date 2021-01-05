@@ -14,10 +14,12 @@ import {DrawerContentScrollView, DrawerItem} from '@react-navigation/drawer';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useDispatch} from 'react-redux';
 import {loginActions} from '../../store/actions/loginActions';
+import ThemeContext from '../../themes/themeContext';
 
 export function DrawerContent(props) {
     const paperTheme = useTheme();
     const dispatch = useDispatch();
+    const {toggleTheme} = React.useContext(ThemeContext);
     const signOut = () => {
         dispatch(loginActions.logoutUser());
     };
