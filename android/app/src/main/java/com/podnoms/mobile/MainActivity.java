@@ -10,10 +10,25 @@ import com.facebook.react.ReactActivityDelegate;
 
 public class MainActivity extends ReactActivity {
 
-    /**
-     * Returns the name of the main component registered from JavaScript. This is used to schedule
-     * rendering of the component.
-     */
+    @Override
+    protected void onCreate(final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        String type = intent.getType();
+
+        // Match the intent specified in AndroidManifest.xml
+        if (Intent.ACTION_SEND.equals(action) && "text/plain".equals(type)) {
+            Bundle bundle = new Bundle();
+            String shareUrl = intent.getStringExtra(Intent.EXTRA_TEXT);
+            if (!TextUtils.isEmpty(shareUrl)) {
+                bundle.putString("shareUrl", shareUrl);
+            }
+//            reactRootView.setAppProperties(bundle);
+        }
+    }
+
     @Override
     protected String getMainComponentName() {
         return "PodNomsMobile";
