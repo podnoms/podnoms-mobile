@@ -6,8 +6,6 @@ import {
     LOGOUT_COMPLETE,
     LOGIN_SUCCESS,
 } from '../types';
-import {logger} from 'react-native-logs';
-var log = logger.createLogger();
 
 const initialState = {
     isLoading: true,
@@ -18,14 +16,12 @@ const initialState = {
 export default function (prevState = initialState, action) {
     switch (action.type) {
         case LOGIN_STARTED:
-            log.debug('loginReducer', LOGIN_STARTED, prevState);
             return {
                 ...prevState,
                 isLoading: true,
             };
         case LOGIN_SUCCESS:
         case LOGIN_INIT_SUCCESS:
-            log.debug('loginReducer', action.type, prevState, action.user.name);
             return {
                 ...prevState,
                 user: action.user,
@@ -33,7 +29,6 @@ export default function (prevState = initialState, action) {
                 isLoading: false,
             };
         case LOGIN_REQUIRED:
-            log.debug('loginReducer', LOGIN_REQUIRED, prevState);
             return {
                 ...prevState,
                 user: null,
@@ -41,7 +36,6 @@ export default function (prevState = initialState, action) {
                 isLoading: false,
             };
         case LOGGEDIN:
-            log.debug('loginReducer', LOGGEDIN, prevState);
             return {
                 ...prevState,
                 user: action.user,
@@ -49,7 +43,6 @@ export default function (prevState = initialState, action) {
                 isLoading: false,
             };
         case LOGOUT_COMPLETE:
-            log.debug('loginReducer', LOGOUT_COMPLETE, prevState);
             return {
                 ...prevState,
                 user: null,

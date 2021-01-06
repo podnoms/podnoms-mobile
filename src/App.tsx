@@ -1,10 +1,10 @@
-import React from 'react';
+import React, {Component} from 'react';
 
-import {useEffect, useContext, useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {Provider as StoreProvider, useSelector, useDispatch} from 'react-redux';
 import {Provider as PaperProvider} from 'react-native-paper';
 
-import CustomDarkTheme from './themes/customDarkTheme';
+import CustomDarkTheme from './themes/CustomDarkTheme';
 import CustomDefaultTheme from './themes/CustomDefaultTheme';
 import LoginStackScreen from './navigation/LoginStack';
 import store from './store';
@@ -14,21 +14,31 @@ import ThemeContext from './themes/themeContext';
 import {loginActions} from './store/actions/loginActions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-function AppWrapper() {
-    return (
-        <StoreProvider store={store}>
-            <App />
-        </StoreProvider>
-    );
+class AppWrapper extends Component {
+    render() {
+        return (
+            <StoreProvider store={store}>
+                <App shareUrl={this.props.shareUrl} />
+            </StoreProvider>
+        );
+    }
 }
+// function AppWrapper(props) {
+//     return (
+//         <StoreProvider store={store}>
+//             <App props={props} />
+//         </StoreProvider>
+//     );
+// }
 
-function App() {
+function App(props) {
+    console.log('App', 'Props', props);
+
     const loginState = useSelector((state) => state.loginState);
     const dispatch = useDispatch();
 
     const [isDarkTheme, setIsDarkTheme] = useState(false);
     const theme = isDarkTheme ? CustomDarkTheme : CustomDefaultTheme;
-    const {toggleTheme} = useContext(ThemeContext);
 
     useEffect(() => {
         dispatch(loginActions.loginCheckStatus());
@@ -37,7 +47,6 @@ function App() {
     useEffect(() => {
         async function loadTheme() {
             const theme = await AsyncStorage.getItem('isdark');
-            console.log('App', 'loadingTheme', theme);
             if (JSON.parse(theme || 'false')) {
                 setIsDarkTheme(true);
             }
@@ -61,8 +70,7 @@ function App() {
 
     const renderInner = () => {
         if (loginState.isLoggedIn) {
-            console.log('App', 'Into app');
-            return <AppStackScreen />;
+            return <AppStackScreen shareUrl={props?.shareUrl} />;
         } else {
             // return <AppStackScreen />;
             return <LoginStackScreen />;

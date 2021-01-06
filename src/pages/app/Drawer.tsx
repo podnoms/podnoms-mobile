@@ -17,12 +17,12 @@ import {loginActions} from '../../store/actions/loginActions';
 import ThemeContext from '../../themes/themeContext';
 
 export function DrawerContent(props) {
-    const paperTheme = useTheme();
+    const theme = useTheme();
     const dispatch = useDispatch();
 
     const {loading, profile} = useSelector((state) => state.profileState);
-    console.log('Drawer', 'Profile', profile);
     const {toggleTheme} = useContext(ThemeContext);
+
     const signOut = () => {
         dispatch(loginActions.logoutUser());
     };
@@ -147,7 +147,7 @@ export function DrawerContent(props) {
                             <View style={styles.preference}>
                                 <Text>Dark Theme</Text>
                                 <View pointerEvents="none">
-                                    <Switch value={paperTheme.dark} />
+                                    <Switch value={theme.dark} />
                                 </View>
                             </View>
                         </TouchableRipple>

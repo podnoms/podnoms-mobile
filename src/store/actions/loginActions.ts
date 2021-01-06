@@ -17,18 +17,15 @@ import {
 const loginCheckStatus = () => {
     const service = new LoginService();
     return async function (dispatch: any, getState: any) {
-        console.log('loginActions', 'loginCheckStatus');
         try {
             dispatch(request());
             const t = await AsyncStorage.getItem('user');
             const stored = User.fromStorage(JSON.parse(t));
-            console.log('loginActions', 'loginCheckStatus-stored', stored);
             if (stored) {
                 const user = await service.refreshToken(
                     stored?.token,
                     stored?.refreshToken,
                 );
-                console.log('loginActions', 'loginCheckStatus-refresh', user);
                 if (user) {
                     dispatch(success(user));
                 }
@@ -36,7 +33,6 @@ const loginCheckStatus = () => {
                 console.log('loginActions', 'No user stored');
             }
         } catch (err) {
-            console.log('loginActions', 'Error refreshing tokens', err);
             dispatch(failure(err));
         }
     };
@@ -58,11 +54,6 @@ const loginUser = (username: string, password: string) => {
             dispatch(request(username));
             const res = await service.loginUser(username, password);
             await AsyncStorage.setItem('user', JSON.stringify(res));
-            console.log(
-                'loginActions',
-                'Stored user',
-                await AsyncStorage.getItem('user'),
-            );
             dispatch({type: LOGGEDIN, user: res});
             dispatch(success(res));
         } catch (err) {

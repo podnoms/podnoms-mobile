@@ -13,8 +13,7 @@ import {useDispatch} from 'react-redux';
 import {List} from 'react-native-paper';
 import {podcastActions} from '../../store/actions/podcastActions';
 
-const PodcastListScreen = ({props}) => {
-    console.log('PodcastList', 'Starting', props);
+const PodcastListScreen = () => {
     const theme = useTheme();
     const podcasts = useSelector((state) => state.podcastState.podcasts);
     const dispatch = useDispatch();

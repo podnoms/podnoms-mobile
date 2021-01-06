@@ -16,3 +16,11 @@ npx react-native bundle \
 
 echo "Creating release"
 cd android && ./gradlew assembleRelease
+
+echo "Uploading to web"
+az storage blob upload \
+    --account-name podnomscdn \
+    --container-name '$web' \
+    --name assets/podnoms-mobile.apk \
+    --file ./android/app/build/outputs/apk/release/app-release.apk \
+    --auth-mode key

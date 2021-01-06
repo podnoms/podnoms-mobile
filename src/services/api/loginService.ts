@@ -1,12 +1,9 @@
 import UserToken from '../../model/UserToken';
 import ApiService from './apiService';
 import {logger} from 'react-native-logs';
-const log = logger.createLogger();
-log.debug('loginService', 'Bootstrapping');
 
 class LoginService extends ApiService {
     loginUser = async (userName: string, password: string) => {
-        log.debug('loginService', 'Logging in', userName);
         const client = await this.requestClient();
 
         const payload = {
@@ -26,7 +23,6 @@ class LoginService extends ApiService {
     };
 
     refreshToken = async (accessToken: string, refreshToken: string) => {
-        log.debug('loginService', 'refreshToken');
 
         const client = await this.requestClient();
         const payload = {
@@ -35,7 +31,6 @@ class LoginService extends ApiService {
         };
         try {
             const response = await client.post('/auth/refreshtoken', payload);
-
             if (response && response.status === 200) {
                 return UserToken.fromJson(response.data);
             }

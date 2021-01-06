@@ -8,7 +8,6 @@ const service = new PodcastService();
 const getPodcasts = () => {
     return async function (dispatch: any, getState: any) {
         try {
-            log.debug('podcastActions', 'getPodcasts');
             dispatch(
                 dispatch({
                     type: GET_PODCASTS_STARTED,
