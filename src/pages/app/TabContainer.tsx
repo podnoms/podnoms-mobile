@@ -4,10 +4,11 @@ import {createStackNavigator} from '@react-navigation/stack';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import PodcastListScreen from './PodcastList';
+import EpisodeListScreen from './EpisodeList';
+import EpisodeScreen from './Episode';
 import DebugScreen from '../Debug';
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 import {StyleSheet} from 'react-native';
-import EpisodeListScreen from './EpisodeList';
 
 const PodcastListStack = createStackNavigator();
 const DetailsStack = createStackNavigator();
@@ -60,6 +61,20 @@ const PodcastListStackScreen = ({navigation}) => (
         <PodcastListStack.Screen
             name="EpisodeList"
             component={EpisodeListScreen}
+            options={{
+                headerLeft: () => (
+                    <Icon.Button
+                        name="ios-menu"
+                        size={25}
+                        backgroundColor="#009387"
+                        onPress={() => navigation.openDrawer()}
+                    />
+                ),
+            }}
+        />
+        <PodcastListStack.Screen
+            name="Episode"
+            component={EpisodeScreen}
             options={{
                 headerLeft: () => (
                     <Icon.Button

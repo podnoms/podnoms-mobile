@@ -3,6 +3,8 @@ import {useTheme} from '@react-navigation/native';
 import {View, StyleSheet, StatusBar, ScrollView} from 'react-native';
 
 import {Avatar, Banner, Card, IconButton, List, Text} from 'react-native-paper';
+import {Podcast} from '../../model/Podcast';
+import { Episode } from '../../model/Episode';
 
 const EpisodeListScreen = ({route, navigation}) => {
     const [visible, setVisible] = React.useState<boolean>(true);
@@ -14,10 +16,9 @@ const EpisodeListScreen = ({route, navigation}) => {
 
     const theme = useTheme();
 
-    const switchView = (episodeId: string) => {
-        console.log('EpisodeList', 'Switching View', episodeId);
+    const switchView = (episode: Episode) => {
+        navigation.navigate('Episode', {episode: episode});
     };
-
     return (
         <View style={styles.container}>
             <StatusBar
@@ -32,7 +33,7 @@ const EpisodeListScreen = ({route, navigation}) => {
                             description={`${e.strippedDescription || ''}\n${
                                 e.createDate
                             }`}
-                            onPress={() => switchView(e.id)}
+                            onPress={() => switchView(e)}
                             left={() => (
                                 <Avatar.Image source={{uri: e.thumbnailUrl}} />
                             )}
