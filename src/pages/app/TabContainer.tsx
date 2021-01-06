@@ -5,51 +5,47 @@ import {createStackNavigator} from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/Ionicons';
 import PodcastListScreen from './PodcastList';
 import DebugScreen from '../Debug';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
+import {StyleSheet} from 'react-native';
 
 const PodcastListStack = createStackNavigator();
 const DetailsStack = createStackNavigator();
 
-const Tab = createBottomTabNavigator();
+const Tab = createMaterialBottomTabNavigator();
 
 const MainTabScreen = () => (
-    <Tab.Navigator
-        screenOptions={({route}) => ({
-            tabBarIcon: ({focused, color, size}) => {
-                let iconName;
-                if (route.name === 'Podcasts') {
-                    iconName = focused ? 'ios-menu' : 'ios-menu';
-                } else if (route.name === 'Debug') {
-                    iconName = focused ? 'ios-menu' : 'ios-menu';
-                }
-                return <Icon name={iconName} size={size} color={color} />;
-            },
-        })}
-        tabBarOptions={{
-            activeTintColor: 'tomato',
-            inactiveTintColor: 'gray',
-        }}>
-        <Tab.Screen name="Podcasts" component={PodcastListStackScreen} />
-        <Tab.Screen name="Debug" component={DebugStackScreen} />
+    <Tab.Navigator initialRouteName="Podcasts" activeColor="#fff">
+        <Tab.Screen
+            name="Podcasts"
+            component={PodcastListStackScreen}
+            options={{
+                tabBarLabel: 'Podcasts',
+                tabBarColor: '#009387',
+                tabBarIcon: ({color}) => (
+                    <Icon name="logo-rss" color={color} size={26} />
+                ),
+            }}
+        />
+        <Tab.Screen
+            name="Debug"
+            component={DebugStackScreen}
+            options={{
+                tabBarLabel: 'Debug',
+                tabBarColor: '#009387',
+                tabBarIcon: ({color}) => (
+                    <Icon name="bug-outline" color={color} size={26} />
+                ),
+            }}
+        />
     </Tab.Navigator>
 );
 
 const PodcastListStackScreen = ({navigation}) => (
-    <PodcastListStack.Navigator
-        screenOptions={{
-            headerStyle: {
-                backgroundColor: '#009387',
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-                fontWeight: 'bold',
-            },
-        }}>
+    <PodcastListStack.Navigator screenOptions={screenOptions}>
         <PodcastListStack.Screen
             name="PodcastList"
             component={PodcastListScreen}
             options={{
-                title: 'Podcasts',
                 headerLeft: () => (
                     <Icon.Button
                         name="ios-menu"
@@ -63,23 +59,14 @@ const PodcastListStackScreen = ({navigation}) => (
 );
 
 const DebugStackScreen = ({navigation}) => (
-    <DetailsStack.Navigator
-        screenOptions={{
-            headerStyle: {
-                backgroundColor: '#1f65ff',
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-                fontWeight: 'bold',
-            },
-        }}>
+    <DetailsStack.Navigator screenOptions={screenOptions}>
         <DetailsStack.Screen
             name="Debug"
             component={DebugScreen}
             options={{
                 headerLeft: () => (
                     <Icon.Button
-                        name="bug-outline"
+                        name="ios-menu"
                         size={25}
                         backgroundColor="#009387"
                         onPress={() => navigation.openDrawer()}></Icon.Button>
@@ -88,4 +75,13 @@ const DebugStackScreen = ({navigation}) => (
         />
     </DetailsStack.Navigator>
 );
+const screenOptions = {
+    headerStyle: {
+        backgroundColor: '#009387',
+    },
+    headerTintColor: '#fff',
+    headerTitleStyle: {
+        fontWeight: 'bold',
+    },
+};
 export default MainTabScreen;

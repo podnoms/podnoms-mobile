@@ -6,7 +6,7 @@ import {
     StatusBar,
     Dimensions,
 } from 'react-native';
-import {Snackbar, Text} from 'react-native-paper';
+import {Snackbar, Text, TextInput} from 'react-native-paper';
 import {useTheme} from 'react-native-paper';
 import * as Animatable from 'react-native-animatable';
 import LinearGradient from 'react-native-linear-gradient';
@@ -16,15 +16,21 @@ import {useEffect} from 'react';
 import {podcastActions} from '../../store/actions/podcastActions';
 import DropDownPicker from 'react-native-dropdown-picker';
 import PodcastService from '../../services/api/podcastService';
+import {navigate} from '../../navigation/rootNavigator';
 
 const SharingScreen = (props) => {
     const {colors} = useTheme();
     const podcasts = useSelector((state) => state.podcastState.podcasts);
-    const [selectedPodcast, setSelectedPodcast] = useState();
+    const [selectedPodcast, setSelectedPodcast] = useState<any>();
+    const [podcastTitle, setPodcastTitle] = useState<string>(
+        props.sourceTitle || 'New from PodNoms Mobile',
+    );
     const [snackBarVisible, setSnackBarVisible] = React.useState<boolean>(
         false,
     );
-    const [snackBarText, setSnackBarText] = React.useState<string>('');
+    const [snackBarText, setSnackBarText] = React.useState<string>(
+        'New from PodNoms Mobile',
+    );
 
     const dispatch = useDispatch();
 
@@ -41,9 +47,24 @@ const SharingScreen = (props) => {
             setSnackBarVisible(true);
             return;
         }
-
-        const result = await service.addPodcastEntry(props.shareUrl, selectedPodcast);
-
+        try {
+            const result = await service.addPodcastEntry(
+                selectedPodcast.value,
+                props.shareUrl,
+                podcastTitle,
+            );
+            if (result) {
+                setSnackBarText(
+                    'Entry successfully added, visit podnoms.com to view progress!',
+                );
+                setSnackBarVisible(true);
+                return;
+            }
+        } catch (err) {
+            console.log('Sharing', 'Error creating entry', err);
+        }
+        setSnackBarText('Unable to add this entry at this time!');
+        setSnackBarVisible(true);
     };
 
     useEffect(() => {
@@ -96,6 +117,14 @@ const SharingScreen = (props) => {
                     dropDownStyle={styles.dropdown}
                     onChangeItem={(item) => setSelectedPodcast(item)}
                 />
+                <TextInput
+                    style={styles.inputContainerStyle}
+                    dense
+                    label="Entry title"
+                    placeholder="Type something"
+                    value={podcastTitle}
+                    onChangeText={(title) => setPodcastTitle(title)}
+                />
                 <View style={styles.button}>
                     <TouchableOpacity
                         onPress={() => {
@@ -110,6 +139,23 @@ const SharingScreen = (props) => {
                                 color="#fff"
                                 size={20}
                             />
+                        </LinearGradient>
+                    </TouchableOpacity>
+                </View>
+                <View style={styles.button}>
+                    <TouchableOpacity
+                        onPress={() => {
+                            navigate('Debug', '');
+                        }}>
+                        <LinearGradient
+                            colors={['#08d4c4', '#01ab9d']}
+                            style={styles.sendButton}>
+                            <MaterialIcons
+                                name="bug-report"
+                                color="#fff"
+                                size={20}
+                            />
+                            <Text style={styles.textSign}>Debug!</Text>
                         </LinearGradient>
                     </TouchableOpacity>
                 </View>
@@ -146,6 +192,9 @@ const styles = StyleSheet.create({
     },
     dropdown: {
         backgroundColor: '#fafafa',
+    },
+    inputContainerStyle: {
+        margin: 8,
     },
     header: {
         flex: 2,
