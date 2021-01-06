@@ -13,6 +13,7 @@ import AppStackScreen from './navigation/AppStack';
 import ThemeContext from './themes/themeContext';
 import {loginActions} from './store/actions/loginActions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {AppState} from 'react-native';
 
 class AppWrapper extends Component {
     render() {
@@ -34,6 +35,18 @@ function App(props) {
     useEffect(() => {
         dispatch(loginActions.loginCheckStatus());
     }, [dispatch]);
+
+    useEffect(() => {
+        AppState.addEventListener('change', handleChange);
+
+        return () => {
+            AppState.removeEventListener('change', handleChange);
+        };
+    }, []);
+
+    const handleChange = (newState) => {
+        console.log('App', 'HandleChange', newState);
+    };
 
     useEffect(() => {
         async function loadTheme() {
