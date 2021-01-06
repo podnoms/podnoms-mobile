@@ -17,7 +17,7 @@ const MainTabScreen = () => (
         screenOptions={({route}) => ({
             tabBarIcon: ({focused, color, size}) => {
                 let iconName;
-                if (route.name === 'Home') {
+                if (route.name === 'Podcasts') {
                     iconName = focused ? 'ios-menu' : 'ios-menu';
                 } else if (route.name === 'Debug') {
                     iconName = focused ? 'ios-menu' : 'ios-menu';
@@ -29,8 +29,8 @@ const MainTabScreen = () => (
             activeTintColor: 'tomato',
             inactiveTintColor: 'gray',
         }}>
-        <Tab.Screen name="PodcastList" component={PodcastListStackScreen} />
-        <Tab.Screen name="Settings" component={DebugStackScreen} />
+        <Tab.Screen name="Podcasts" component={PodcastListStackScreen} />
+        <Tab.Screen name="Debug" component={DebugStackScreen} />
     </Tab.Navigator>
 );
 
