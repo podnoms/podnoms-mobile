@@ -123,17 +123,6 @@ def enableHermes = project.ext.react.get("enableHermes", true);
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    signingConfigs {
-        release {
-            if (project.hasProperty('PODNOMS_UPLOAD_STORE_FILE')) {
-                storeFile file(PODNOMS_UPLOAD_STORE_FILE)
-                storePassword PODNOMS_UPLOAD_STORE_PASSWORD
-                keyAlias PODNOMS_UPLOAD_KEY_ALIAS
-                keyPassword PODNOMS_UPLOAD_KEY_PASSWORD
-            }
-        }
-    }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -143,8 +132,8 @@ android {
         applicationId "com.podnoms.mobile"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 4
+        versionName "1.4"
     }
     splits {
         abi {
@@ -154,6 +143,7 @@ android {
             include "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
         }
     }
+
     signingConfigs {
         debug {
             storeFile file('debug.keystore')
@@ -161,7 +151,14 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            storeFile file('podnoms.keystore')
+            storePassword PODNOMS_UPLOAD_STORE_PASSWORD
+            keyAlias 'podnoms-mobile'
+            keyPassword PODNOMS_UPLOAD_KEY_PASSWORD
+        }
     }
+
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
