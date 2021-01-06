@@ -153,9 +153,9 @@ android {
         }
         release {
             storeFile file('podnoms.keystore')
-            storePassword PODNOMS_UPLOAD_STORE_PASSWORD
+            storePassword project.env.get('PODNOMS_UPLOAD_STORE_PASSWORD')
             keyAlias 'podnoms-mobile'
-            keyPassword PODNOMS_UPLOAD_KEY_PASSWORD
+            keyPassword project.env.get('PODNOMS_UPLOAD_KEY_PASSWORD')
         }
     }
 

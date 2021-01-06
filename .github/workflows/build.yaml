@@ -23,6 +23,9 @@ jobs:
             - name: Build Android Release
               run: |
                   cd android && ./gradlew assembleRelease -PODNOMS_UPLOAD_STORE_PASSWORD='${{ secrets.KEYSTORE_PASSWORD }}' -PODNOMS_UPLOAD_KEY_PASSWORD='${{ secrets.KEYSTORE_PASSWORD }}'
+              env:
+                PODNOMS_UPLOAD_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+
             - name: Upload Artifact
               uses: actions/upload-artifact@v1
               with:
