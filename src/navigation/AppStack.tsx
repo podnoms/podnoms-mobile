@@ -10,12 +10,12 @@ import DebugScreen from '../pages/Debug';
 const AppStack = createStackNavigator();
 
 const AppStackScreen = (props) => {
+    console.log('AppStack', 'props', props);
     const dispatch = useDispatch();
 
     useEffect(() => {
         dispatch(profileActions.loadProfile());
     }, [dispatch]);
-
     const content = props.shareUrl ? (
         <AppStack.Screen name="SharingScreen">
             {(screenProps) => <SharingScreen shareUrl={props.shareUrl} />}

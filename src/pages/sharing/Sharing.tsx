@@ -40,13 +40,22 @@ const SharingScreen = (props) => {
             setSnackBarVisible(true);
             return;
         }
+        console.log('Sharing', 'sendToPodacst', 'Creating service');
         const service = new PodcastService();
+        console.log('Sharing', 'sendToPodacst', 'Validatating', props.shareUrl);
         const valid = await service.validateUrl(props.shareUrl);
         if (!valid) {
+            console.log(
+                'Sharing',
+                'sendToPodacst',
+                'Validatating',
+                'URL is not valid',
+            );
             setSnackBarText("This doesn't look like a URL we can manage!");
             setSnackBarVisible(true);
             return;
         }
+        console.log('Sharing', 'sendToPodacst', 'Validatating', 'URL is valid');
         try {
             const result = await service.addPodcastEntry(
                 selectedPodcast.value,
