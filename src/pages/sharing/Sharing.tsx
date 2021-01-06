@@ -40,13 +40,22 @@ const SharingScreen = (props) => {
             setSnackBarVisible(true);
             return;
         }
+        console.log('Sharing', 'sendToPodacst', 'Creating service');
         const service = new PodcastService();
+        console.log('Sharing', 'sendToPodacst', 'Validatating', props.shareUrl);
         const valid = await service.validateUrl(props.shareUrl);
         if (!valid) {
+            console.log(
+                'Sharing',
+                'sendToPodacst',
+                'Validatating',
+                'URL is not valid',
+            );
             setSnackBarText("This doesn't look like a URL we can manage!");
             setSnackBarVisible(true);
             return;
         }
+        console.log('Sharing', 'sendToPodacst', 'Validatating', 'URL is valid');
         try {
             const result = await service.addPodcastEntry(
                 selectedPodcast.value,
@@ -139,23 +148,6 @@ const SharingScreen = (props) => {
                                 color="#fff"
                                 size={20}
                             />
-                        </LinearGradient>
-                    </TouchableOpacity>
-                </View>
-                <View style={styles.button}>
-                    <TouchableOpacity
-                        onPress={() => {
-                            navigate('Debug', '');
-                        }}>
-                        <LinearGradient
-                            colors={['#08d4c4', '#01ab9d']}
-                            style={styles.sendButton}>
-                            <MaterialIcons
-                                name="bug-report"
-                                color="#fff"
-                                size={20}
-                            />
-                            <Text style={styles.textSign}>Debug!</Text>
                         </LinearGradient>
                     </TouchableOpacity>
                 </View>

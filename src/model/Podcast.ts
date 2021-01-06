@@ -1,3 +1,5 @@
+import {Episode} from './Episode';
+
 export class Podcast {
     id?: string;
     description?: string;
@@ -23,6 +25,12 @@ export class Podcast {
     lastEntryDate?: Date;
     entryCount?: number;
 
+    episodes: Episode[];
+
+    constructor() {
+        this.episodes = [];
+    }
+
     public static fromJson(json: any) {
         const podcast: Podcast = new Podcast();
 
@@ -33,6 +41,8 @@ export class Podcast {
         podcast.imageUrl = json.imageUrl;
         podcast.thumbnailUrl = json.thumbnailUrl;
         podcast.publicTitle = json.publicTitle;
+
+        podcast.episodes = json.podcastEntries;
         return podcast;
     }
 }

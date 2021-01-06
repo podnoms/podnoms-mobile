@@ -27,6 +27,7 @@ class PodcastService extends ApiService {
         url: string,
         title: string,
     ): Promise<boolean> => {
+        console.log('podcastService', 'Creating client');
         const client = await this.requestClient();
         const payload = {
             podcastId: podcastId,
@@ -36,7 +37,9 @@ class PodcastService extends ApiService {
             description: '',
             imageUrl: '',
         };
+        console.log('podcastService', 'Payload', payload);
         const response = await client.post('/entry', payload);
+        console.log('podcastService', 'Response', response);
         return response && response.status === 200;
     };
 }
