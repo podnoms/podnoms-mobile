@@ -6041,6 +6041,13 @@ react-native-devsettings-android@^0.4.0:
   resolved "https://registry.yarnpkg.com/react-native-devsettings-android/-/react-native-devsettings-android-0.4.0.tgz#9426e6364685623b86fc60e1b4e499e1526db861"
   integrity sha512-nPmn8XsThjimGiiMZhIJ+wFeLALzbv6cT/ESPM7kefRkl4xzgBhjjQRs86Ri2D3UJROcjUrBm2CI3DgWyGW9QA==
 
+react-native-dropdown-picker@^3.7.8:
+  version "3.7.8"
+  resolved "https://registry.yarnpkg.com/react-native-dropdown-picker/-/react-native-dropdown-picker-3.7.8.tgz#fdc79eef1dab4f86b74a565e93ed65406825b0c6"
+  integrity sha512-9WKUgvVK0Pv1ujwp71DikKyjF7ftxQGJLPRizD6LaDcoHxgxtqsnDQcj92PV1iEydwfEDynL7ogy2h/HG0ETbA==
+  dependencies:
+    react-native-vector-icons "^7.0.0"
+
 react-native-flipper@^0.69.0:
   version "0.69.0"
   resolved "https://registry.yarnpkg.com/react-native-flipper/-/react-native-flipper-0.69.0.tgz#6e0ff2d1c91da49bf5536c9ad6cd2980f9e5d0f7"
@@ -6108,7 +6115,12 @@ react-native-screens@^2.16.1:
   resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-2.16.1.tgz#b105a127378d90018a46daf0c2f6518fca60c06f"
   integrity sha512-WZ7m0sBDVaHbBnlHxwQnUlI6KNfQKHq+Unfw+VBuAlnSXvT+aw6Bb/K2bUlHzBgvrPjwY3Spc7ZERFuTwRLLwg==
 
-react-native-vector-icons@^7.1.0:
+react-native-snackbar@^2.3.1:
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/react-native-snackbar/-/react-native-snackbar-2.3.1.tgz#62cef7c60d043f31d07641799e36bfd1445f826b"
+  integrity sha512-eWVEvdCiyx2K57Zv7xnnTzHuBqJSIA8SgFnKXQkmejENk97L+vTWik/QzXmwQ9AOxHVRmogBoHADVbdxGOfPZw==
+
+react-native-vector-icons@^7.0.0, react-native-vector-icons@^7.1.0:
   version "7.1.0"
   resolved "https://registry.yarnpkg.com/react-native-vector-icons/-/react-native-vector-icons-7.1.0.tgz#145487d617b2a81d395d2cf64e6e065fcab3a454"
   integrity sha512-V2a1zJ4i+kS8O4j183gIwX14St9AxxXabxwYpFBgRhvr2NDXyFcjHDEAgrOYYlt2W57e20aN1tBDU/I+wn9WtQ==

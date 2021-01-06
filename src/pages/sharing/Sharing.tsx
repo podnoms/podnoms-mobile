@@ -6,7 +6,7 @@ import {
     StatusBar,
     Dimensions,
 } from 'react-native';
-import {Text, TextInput} from 'react-native-paper';
+import {Snackbar, Text} from 'react-native-paper';
 import {useTheme} from 'react-native-paper';
 import * as Animatable from 'react-native-animatable';
 import LinearGradient from 'react-native-linear-gradient';
@@ -14,15 +14,37 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useSelector, useDispatch} from 'react-redux';
 import {useEffect} from 'react';
 import {podcastActions} from '../../store/actions/podcastActions';
-import DropDown from 'react-native-paper-dropdown';
+import DropDownPicker from 'react-native-dropdown-picker';
+import PodcastService from '../../services/api/podcastService';
 
-const SharingScreen = () => {
+const SharingScreen = (props) => {
     const {colors} = useTheme();
     const podcasts = useSelector((state) => state.podcastState.podcasts);
+    const [selectedPodcast, setSelectedPodcast] = useState();
+    const [snackBarVisible, setSnackBarVisible] = React.useState<boolean>(
+        false,
+    );
+    const [snackBarText, setSnackBarText] = React.useState<string>('');
+
     const dispatch = useDispatch();
-    const [showDropDown, setShowDropDown] = useState(false);
-    const {selectedPodcast, setSelectedPodcast} = useState();
-    const sendToPodcast = () => {};
+
+    const sendToPodcast = async () => {
+        if (!selectedPodcast) {
+            setSnackBarText('Please select a Podcast first');
+            setSnackBarVisible(true);
+            return;
+        }
+        const service = new PodcastService();
+        const valid = await service.validateUrl(props.shareUrl);
+        if (!valid) {
+            setSnackBarText("This doesn't look like a URL we can manage!");
+            setSnackBarVisible(true);
+            return;
+        }
+
+        const result = await service.addPodcastEntry(props.shareUrl, selectedPodcast);
+
+    };
 
     useEffect(() => {
         dispatch(podcastActions.getPodcasts());
@@ -57,18 +79,22 @@ const SharingScreen = () => {
                     ]}>
                     Share To PodNoms!
                 </Text>
-                <DropDown
-                    label={'Choose podcast'}
-                    mode={'outlined'}
-                    value={selectedPodcast}
-                    setValue={setSelectedPodcast}
-                    list={podcasts}
-                    visible={showDropDown}
-                    showDropDown={() => setShowDropDown(true)}
-                    onDismiss={() => setShowDropDown(false)}
-                    inputProps={{
-                        right: <TextInput.Icon name={'menu-down'} />,
-                    }}
+                <View style={styles.subText}>
+                    <Text style={styles.text}>{props.shareUrl}</Text>
+                </View>
+                <DropDownPicker
+                    searchable={true}
+                    placeholder="Choose a podcast"
+                    items={podcasts.map((p) => {
+                        return {
+                            label: p.publicTitle,
+                            value: p.id,
+                        };
+                    })}
+                    containerStyle={styles.dropdownContainer}
+                    style={styles.dropdown}
+                    dropDownStyle={styles.dropdown}
+                    onChangeItem={(item) => setSelectedPodcast(item)}
                 />
                 <View style={styles.button}>
                     <TouchableOpacity
@@ -88,6 +114,18 @@ const SharingScreen = () => {
                     </TouchableOpacity>
                 </View>
             </Animatable.View>
+            <Snackbar
+                visible={snackBarVisible}
+                onDismiss={() => setSnackBarVisible(false)}
+                action={{
+                    label: 'Undo',
+                    onPress: () => {
+                        // Do something
+                    },
+                }}
+                duration={Snackbar.DURATION_MEDIUM}>
+                {snackBarText}
+            </Snackbar>
         </View>
     );
 };
@@ -100,13 +138,22 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#009387',
     },
+    subText: {
+        marginBottom: 12,
+    },
+    dropdownContainer: {
+        height: 40,
+    },
+    dropdown: {
+        backgroundColor: '#fafafa',
+    },
     header: {
         flex: 2,
         justifyContent: 'center',
         alignItems: 'center',
     },
     footer: {
-        flex: 1,
+        flex: 3,
         backgroundColor: '#fff',
         borderTopLeftRadius: 30,
         borderTopRightRadius: 30,

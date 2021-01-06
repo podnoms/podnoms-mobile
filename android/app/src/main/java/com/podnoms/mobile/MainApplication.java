@@ -14,7 +14,9 @@ import me.jhen.devsettings.DevSettingsPackage;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
+import com.facebook.react.modules.network.OkHttpClientProvider;
 import com.facebook.soloader.SoLoader;
+import com.podnoms.mobile.helpers.CustomClientFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -52,6 +54,9 @@ public class MainApplication extends Application implements ReactApplication {
     public void onCreate() {
         super.onCreate();
         SoLoader.init(this, /* native exopackage */ false);
+        if (BuildConfig.DEBUG) {
+            OkHttpClientProvider.setOkHttpClientFactory(new CustomClientFactory()); //add this line.
+        }
         initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
     }
 

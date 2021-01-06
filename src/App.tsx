@@ -23,17 +23,8 @@ class AppWrapper extends Component {
         );
     }
 }
-// function AppWrapper(props) {
-//     return (
-//         <StoreProvider store={store}>
-//             <App props={props} />
-//         </StoreProvider>
-//     );
-// }
 
 function App(props) {
-    console.log('App', 'Props', props);
-
     const loginState = useSelector((state) => state.loginState);
     const dispatch = useDispatch();
 
