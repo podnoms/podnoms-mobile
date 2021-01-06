@@ -18,10 +18,11 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import PodcastService from '../../services/api/podcastService';
 import {navigate} from '../../navigation/rootNavigator';
 
-const SharingScreen = (props) => {
+const SharingScreen = (props, {navigator}) => {
     const {colors} = useTheme();
     const podcasts = useSelector((state) => state.podcastState.podcasts);
     const [selectedPodcast, setSelectedPodcast] = useState<any>();
+    const [sendLocked, setIsSendLocked] = useState<boolean>(false);
     const [podcastTitle, setPodcastTitle] = useState<string>(
         props.sourceTitle || 'New from PodNoms Mobile',
     );
@@ -35,45 +36,58 @@ const SharingScreen = (props) => {
     const dispatch = useDispatch();
 
     const sendToPodcast = async () => {
-        if (!selectedPodcast) {
-            setSnackBarText('Please select a Podcast first');
-            setSnackBarVisible(true);
-            return;
-        }
-        console.log('Sharing', 'sendToPodacst', 'Creating service');
-        const service = new PodcastService();
-        console.log('Sharing', 'sendToPodacst', 'Validatating', props.shareUrl);
-        const valid = await service.validateUrl(props.shareUrl);
-        if (!valid) {
+        try {
+            setIsSendLocked(true);
+            if (!selectedPodcast) {
+                setSnackBarText('Please select a Podcast first');
+                setSnackBarVisible(true);
+                return;
+            }
+            console.log('Sharing', 'sendToPodacst', 'Creating service');
+            const service = new PodcastService();
             console.log(
                 'Sharing',
                 'sendToPodacst',
                 'Validatating',
-                'URL is not valid',
-            );
-            setSnackBarText("This doesn't look like a URL we can manage!");
-            setSnackBarVisible(true);
-            return;
-        }
-        console.log('Sharing', 'sendToPodacst', 'Validatating', 'URL is valid');
-        try {
-            const result = await service.addPodcastEntry(
-                selectedPodcast.value,
                 props.shareUrl,
-                podcastTitle,
             );
-            if (result) {
-                setSnackBarText(
-                    'Entry successfully added, visit podnoms.com to view progress!',
+            const valid = await service.validateUrl(props.shareUrl);
+            if (!valid) {
+                console.log(
+                    'Sharing',
+                    'sendToPodacst',
+                    'Validatating',
+                    'URL is not valid',
                 );
+                setSnackBarText("This doesn't look like a URL we can manage!");
                 setSnackBarVisible(true);
-                return;
+            } else {
+                console.log(
+                    'Sharing',
+                    'sendToPodacst',
+                    'Validatating',
+                    'URL is valid',
+                );
+                const result = await service.addPodcastEntry(
+                    selectedPodcast.value,
+                    props.shareUrl,
+                    podcastTitle,
+                );
+                if (result) {
+                    setSnackBarText(
+                        'Entry successfully added, visit podnoms.com to view progress!',
+                    );
+                    setSnackBarVisible(true);
+                    navigator.navigate('');
+                }
             }
         } catch (err) {
             console.log('Sharing', 'Error creating entry', err);
+            setSnackBarText('Unable to add this entry at this time!');
+            setSnackBarVisible(true);
+        } finally {
+            setIsSendLocked(false);
         }
-        setSnackBarText('Unable to add this entry at this time!');
-        setSnackBarVisible(true);
     };
 
     useEffect(() => {
@@ -124,6 +138,7 @@ const SharingScreen = (props) => {
                     containerStyle={styles.dropdownContainer}
                     style={styles.dropdown}
                     dropDownStyle={styles.dropdown}
+                    dropDownMaxHeight={styles.dropdown.height}
                     onChangeItem={(item) => setSelectedPodcast(item)}
                 />
                 <TextInput
@@ -136,6 +151,7 @@ const SharingScreen = (props) => {
                 />
                 <View style={styles.button}>
                     <TouchableOpacity
+                        disabled={sendLocked}
                         onPress={() => {
                             sendToPodcast();
                         }}>
@@ -184,6 +200,7 @@ const styles = StyleSheet.create({
     },
     dropdown: {
         backgroundColor: '#fafafa',
+        height: 320,
     },
     inputContainerStyle: {
         margin: 8,
