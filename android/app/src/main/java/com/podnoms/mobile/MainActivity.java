@@ -22,16 +22,16 @@ public class MainActivity extends ReactActivity {
     @Override
     protected ReactActivityDelegate createReactActivityDelegate() {
         return new ReactActivityDelegate(this, getMainComponentName()) {
-            @Override
-            protected Bundle getLaunchOptions() {
-                Intent intent = MainActivity.this.getIntent();
-                Bundle bundle = new Bundle();
-                String shareUrl = intent.getStringExtra(Intent.EXTRA_TEXT);
-                if (!TextUtils.isEmpty(shareUrl)) {
-                    bundle.putString("shareUrl", shareUrl);
-                }
-                return bundle;
-            }
+//            @Override
+//            protected Bundle getLaunchOptions() {
+//                Intent intent = MainActivity.this.getIntent();
+//                Bundle bundle = new Bundle();
+//                String shareUrl = intent.getStringExtra(Intent.EXTRA_TEXT);
+//                if (!TextUtils.isEmpty(shareUrl)) {
+//                    bundle.putString("shareUrl", shareUrl);
+//                }
+//                return bundle;
+//            }
         };
     }
 }
