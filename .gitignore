@@ -62,3 +62,4 @@ buck-out/
 # CocoaPods
 /ios/Pods/
 podnoms.keystore
+./android/app/src/main/res/raw/
