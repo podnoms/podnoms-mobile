@@ -6112,6 +6112,11 @@ react-native-screens@^2.16.1:
   resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-2.16.1.tgz#b105a127378d90018a46daf0c2f6518fca60c06f"
   integrity sha512-WZ7m0sBDVaHbBnlHxwQnUlI6KNfQKHq+Unfw+VBuAlnSXvT+aw6Bb/K2bUlHzBgvrPjwY3Spc7ZERFuTwRLLwg==
 
+react-native-share-menu@^5.0.3:
+  version "5.0.3"
+  resolved "https://registry.yarnpkg.com/react-native-share-menu/-/react-native-share-menu-5.0.3.tgz#c128e0dd12335f6e3c2eb8d5d6518ade9977310a"
+  integrity sha512-NtL/jLbcApe6WalXLFCNYo8yFfhLGIIbi9AJgSpRLaf1+V141d7vtoJnd1fYObSGxcZJcKLSW2bkeJrpfbmZnw==
+
 react-native-vector-icons@^7.0.0, react-native-vector-icons@^7.1.0:
   version "7.1.0"
   resolved "https://registry.yarnpkg.com/react-native-vector-icons/-/react-native-vector-icons-7.1.0.tgz#145487d617b2a81d395d2cf64e6e065fcab3a454"
