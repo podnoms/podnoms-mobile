@@ -1,9 +1,7 @@
-/**
- * @format
- */
 import React from 'react';
 
 import {AppRegistry, NativeModules} from 'react-native';
+import TrackPlayer from 'react-native-track-player';
 import {startNetworkLogging} from 'react-native-network-logger';
 import AppWrapper from './src/App';
 import {name as appName} from './app.json';
@@ -38,3 +36,4 @@ log.info(
 );
 
 AppRegistry.registerComponent(appName, () => AppWrapper);
+TrackPlayer.registerPlaybackService(() => require('./service'));
