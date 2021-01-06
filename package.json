@@ -36,13 +36,13 @@
         "react-native-safe-area-context": "^3.1.9",
         "react-native-screens": "^2.16.1",
         "react-native-share-menu": "^5.0.3",
+        "react-native-track-player": "^1.2.3",
         "react-native-vector-icons": "^7.1.0",
         "react-native-web": "~0.14.10",
         "react-redux": "^7.2.2",
         "redux": "^4.0.5",
         "redux-devtools-extension": "^2.13.8",
-        "redux-thunk": "^2.3.0",
-        "rn-extensions-share": "^2.4.0"
+        "redux-thunk": "^2.3.0"
     },
     "devDependencies": {
         "@babel/core": "^7.8.4",

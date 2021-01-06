@@ -20,6 +20,7 @@ type SharedItem = {
     data: string;
     extraData: any;
 };
+import {AppState} from 'react-native';
 
 class AppWrapper extends Component {
     render() {
@@ -71,6 +72,18 @@ function App() {
     useEffect(() => {
         dispatch(loginActions.loginCheckStatus());
     }, [dispatch]);
+
+    useEffect(() => {
+        AppState.addEventListener('change', handleChange);
+
+        return () => {
+            AppState.removeEventListener('change', handleChange);
+        };
+    }, []);
+
+    const handleChange = (newState) => {
+        console.log('App', 'HandleChange', newState);
+    };
 
     useEffect(() => {
         async function loadTheme() {
