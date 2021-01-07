@@ -4,7 +4,7 @@ import {View, StyleSheet, StatusBar, ScrollView} from 'react-native';
 
 import {Avatar, Banner, Card, IconButton, List, Text} from 'react-native-paper';
 import {Podcast} from '../../model/Podcast';
-import { Episode } from '../../model/Episode';
+import {Episode} from '../../model/Episode';
 
 const EpisodeListScreen = ({route, navigation}) => {
     const [visible, setVisible] = React.useState<boolean>(true);
@@ -31,7 +31,7 @@ const EpisodeListScreen = ({route, navigation}) => {
                             key={e.id}
                             title={e.title}
                             description={`${e.strippedDescription || ''}\n${
-                                e.createDate
+                                e.displayDate
                             }`}
                             onPress={() => switchView(e)}
                             left={() => (

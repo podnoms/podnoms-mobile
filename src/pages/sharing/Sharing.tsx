@@ -33,6 +33,8 @@ const SharingScreen = (props) => {
     const [processMessage, setProcessMessage] = useState<string>(
         'Ready to upload',
     );
+    const [showProgressBar, setShowProgressBar] = useState<boolean>(true);
+
     const [isValidUrl, setIsValidUrl] = useState(false);
     const [selectedPodcast, setSelectedPodcast] = useState<any>();
     const [isProcessingPodcast, setIsProcessingPodcast] = useState<boolean>(
@@ -61,27 +63,16 @@ const SharingScreen = (props) => {
                 setSnackBarVisible(true);
                 return;
             }
-            console.log('Sharing', 'sendToPodacst', 'Creating service');
             const service = new PodcastService();
-            console.log(
-                'Sharing',
-                'sendToPodacst',
-                'Validatating',
-                props.shareUrl,
-            );
-            console.log(
-                'Sharing',
-                'sendToPodacst',
-                'Validatating',
-                'URL is valid',
-            );
+            setProcessMessage('Creating entry');
+            setShowProgressBar(true);
             const episode = await service.addPodcastEntry(
                 selectedPodcast.value,
                 props.shareUrl,
                 podcastTitle,
             );
             if (episode && episode.id) {
-                setProcessMessage('Waiting for server processing');
+                setProcessMessage('Entry created, processing..');
                 setEpisodeId(episode.id);
                 setIsAwaitingProgress(true);
             }
@@ -97,20 +88,28 @@ const SharingScreen = (props) => {
     useEffect(() => {
         async function checkForValidUrl(url) {
             const service = new PodcastService();
-            const valid = await service.validateUrl(url);
-            if (!valid) {
-                console.log(
-                    'Sharing',
-                    'sendToPodacst',
-                    'Validatating',
-                    'URL is not valid',
-                );
-                setSnackBarText("This doesn't look like a URL we can manage!");
-                setSnackBarVisible(true);
+            try {
+                const valid = await service.validateUrl(url);
+                if (!valid && !valid.type) {
+                    setSnackBarText(
+                        "This doesn't look like a URL we can manage!",
+                    );
+                    setSnackBarVisible(true);
+                } else {
+                    if (valid.title) {
+                        setPodcastTitle(valid.title);
+                    }
+                    setProcessMessage('URL checks out - ready to send');
+                    setIsValidUrl(true);
+                    setShowProgressBar(false);
+                }
+            } catch (err) {
+                setProcessMessage('Unable to validate the url at this time');
                 setIsValidUrl(false);
             }
         }
         if (props.shareUrl) {
+            setProcessMessage('Checking shared URL');
             checkForValidUrl(props.shareUrl);
         }
     }, [props.shareUrl]);
@@ -160,7 +159,7 @@ const SharingScreen = (props) => {
                     placeholder="Choose a podcast"
                     items={podcasts.map((p) => {
                         return {
-                            label: p.publicTitle,
+                            label: p.title,
                             value: p.id,
                         };
                     })}
@@ -187,7 +186,9 @@ const SharingScreen = (props) => {
                         disabled={
                             isProcessingPodcast ||
                             isAwaitingProgress ||
-                            episodeProcessed
+                            episodeProcessed ||
+                            !isValidUrl ||
+                            !selectedPodcast
                         }
                         onPress={() => {
                             setIsProcessingPodcast(true);
@@ -201,7 +202,10 @@ const SharingScreen = (props) => {
                 <View style={styles.progressArea}>
                     <ProcessingProgressControl
                         processMessage={processMessage}
+                        showProgressBar={showProgressBar}
                         onEpisodeProcessed={() => {
+                            setIsProcessingPodcast(false);
+                            setProcessMessage('');
                             setIsAwaitingProgress(false);
                             setEpisodeProcessed(true);
                         }}

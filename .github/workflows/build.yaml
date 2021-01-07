@@ -20,13 +20,15 @@ jobs:
             - name: Install npm dependencies
               run: |
                   npm install
+            - name: Setup tmate session
+              uses: mxschmitt/action-tmate@v3
             - name: Build Android Release
               run: |
                   echo "{{ secrets.RELEASE_KEYSTORE }}" > release.keystore.asc
                   gpg -d --passphrase "${{ secrets.KEYSTORE_PASSWORD }}" --batch release.keystore.asc > app/podnoms.keystore
                   cd android && ./gradlew assembleRelease -PODNOMS_UPLOAD_STORE_PASSWORD='${{ secrets.KEYSTORE_PASSWORD }}' -PODNOMS_UPLOAD_KEY_PASSWORD='${{ secrets.KEYSTORE_PASSWORD }}'
               env:
-                PODNOMS_UPLOAD_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+                  PODNOMS_UPLOAD_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
 
             - name: Upload Artifact
               uses: actions/upload-artifact@v1
