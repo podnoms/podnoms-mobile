@@ -1,5 +1,5 @@
 import {Platform} from 'react-native';
-import Logger from './services/logger';
+import {Logger} from'./services/logger';
 
 const localhost =
     Platform.OS === 'ios' ? 'http://localhost:5000' : 'http://10.1.1.1:5000';

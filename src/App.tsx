@@ -13,8 +13,11 @@ import ThemeContext from './themes/themeContext';
 import {loginActions} from './store/actions/loginActions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ShareMenu from 'react-native-share-menu';
-import Logger from './services/logger';
 import LoginStackScreen from './navigation/LoginStack';
+import { Logger } from './services/logger';
+
+
+const logger = Logger.getInstance();
 
 type SharedItem = {
     mimeType: string;
@@ -92,7 +95,7 @@ const ShareListener = () => {
         setSharedData(data);
         setSharedMimeType(mimeType);
         // You can receive extra data from your custom Share View
-        Logger.info(extraData);
+        logger.info(extraData);
     }, []);
 
     useEffect(() => {

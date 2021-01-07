@@ -10,6 +10,7 @@ import {Divider, Paragraph, ProgressBar, Text} from 'react-native-paper';
 import UserToken from '../model/UserToken';
 import {StyleSheet, View} from 'react-native';
 import {Logger} from '../services/logger';
+const logger = Logger.getInstance();
 
 const {hubUrl} = getEnvVars();
 const getProcessingStatus = (status: number) => {
@@ -110,7 +111,7 @@ const ProcessingProgressControl = (props) => {
         try {
             await connection.start();
         } catch (err) {
-            Logger.error(
+            logger.error(
                 'ProcessingProgressControl',
                 'Error creating the SignalR connection',
                 err,
@@ -118,7 +119,7 @@ const ProcessingProgressControl = (props) => {
         }
 
         if (connection.state === HubConnectionState.Connected) {
-            Logger.log('ProcessingProgressControl', 'SignalR Hub - Connected');
+            logger.errorlog('ProcessingProgressControl', 'SignalR Hub - Connected');
         }
         return connection;
     };

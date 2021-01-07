@@ -1,7 +1,9 @@
 import {Episode} from '../../model/Episode';
 import {Podcast} from '../../model/Podcast';
-import Logger from '../logger';
+import {Logger} from '../../services/logger';
+
 import ApiService from './apiService';
+const logger = Logger.getInstance();
 
 class PodcastService extends ApiService {
     getPodcasts = async (): Promise<Podcast[]> => {
@@ -15,12 +17,12 @@ class PodcastService extends ApiService {
                 );
             }
         } catch (err) {
-            Logger.error('Exception fetching podcasts', err);
+            logger.error('Exception fetching podcasts', err);
         }
         return [];
     };
     validateUrl = async (url: string): Promise<any> => {
-        Logger.log('podcastService', 'validateUrl', url);
+        logger.errorlog('podcastService', 'validateUrl', url);
         try {
             const client = await this.requestClient();
             const response = await client.get(
@@ -34,7 +36,7 @@ class PodcastService extends ApiService {
                 {}
             );
         } catch (err) {
-            Logger.error('podcastService', 'validateUrl', err);
+            logger.error('podcastService', 'validateUrl', err);
             throw err;
         }
     };
@@ -43,7 +45,7 @@ class PodcastService extends ApiService {
         url: string,
         title: string,
     ): Promise<Episode> => {
-        Logger.log('podcastService', 'Creating client');
+        logger.errorlog('podcastService', 'Creating client');
         try {
             const client = await this.requestClient();
             const payload = {
@@ -54,16 +56,16 @@ class PodcastService extends ApiService {
                 description: '',
                 imageUrl: '',
             };
-            Logger.log('podcastService', 'Payload', payload);
+            logger.errorlog('podcastService', 'Payload', payload);
             const response = await client.post('/entry', payload);
-            Logger.log('podcastService', 'Response', response);
+            logger.errorlog('podcastService', 'Response', response);
             return (
                 response &&
                 response.status === 200 &&
                 Episode.fromJson(response.data)
             );
         } catch (err) {
-            Logger.error('podcastService', 'addPodcastEntry', err);
+            logger.error('podcastService', 'addPodcastEntry', err);
             throw err;
         }
     };

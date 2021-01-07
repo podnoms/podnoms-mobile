@@ -1,4 +1,7 @@
-import Logger from '../../services/logger';
+import {Logger} from '../../services/logger';
+
+const logger = Logger.getInstance();
+
 import {
     LOGIN_STARTED,
     LOGIN_REQUIRED,
@@ -49,7 +52,7 @@ export default function (prevState = initialState, action) {
                 isLoginError: false,
             };
         case LOGIN_FAILED:
-            Logger.log('loginReducer', 'LOGIN_FAILED', action);
+            logger.errorlog('loginReducer', 'LOGIN_FAILED', action);
             return {
                 ...prevState,
                 user: null,

@@ -6,12 +6,13 @@ import DefaultAppScreen from '../pages/app/DefaultAppScreen';
 import {profileActions} from '../store/actions/profileActions';
 import SharingScreen from '../pages/sharing/Sharing';
 import DebugScreen from '../pages/Debug';
-import Logger  from '../services/logger';
+import {Logger} from '../services/logger';
+const logger = Logger.getInstance();
 
 const AppStack = createStackNavigator();
 
 const AppStackScreen = (props) => {
-    Logger.log('AppStack', 'props', props);
+    logger.errorlog('AppStack', 'props', props);
     const dispatch = useDispatch();
 
     useEffect(() => {

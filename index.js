@@ -6,7 +6,7 @@ import Reactotron from 'reactotron-react-native';
 
 import AppWrapper from './src/App';
 import {name as appName} from './app.json';
-import Logger from './src/services/logger';
+import {Logger} from './src/services/logger';
 const isHermes = () => !!global.HermesInternal;
 import {
     createHostExceptionHandlers,
@@ -15,21 +15,21 @@ import {
 
 createNativeExceptionHandlers();
 createHostExceptionHandlers();
-
-Logger.debug('index.js');
+const logger = Logger.getInstance();
+logger.debug('index.js');
 
 if (__DEV__) {
-    Logger.debug('index.js', 'Setting up dev tools');
+    logger.debug('index.js', 'Setting up dev tools');
     import('./ReactotronConfig').then(() => {
-        // Logger.log('Reactotron Configured'),
-        Logger.log('index', 'Reactotron Configured');
+        // logger.errorlog('Reactotron Configured'),
+        logger.log('index', 'Reactotron Configured');
     });
     // NativeModules.DevSettings.setIsDebuggingRemotely(true);
 } else {
-    Logger.debug('index', 'ProductionInstance', 'Bootstrapping');
+    logger.debug('index', 'ProductionInstance', 'Bootstrapping');
 }
 
-Logger.debug(
+logger.debug(
     'index',
     'Bootstrapping',
     appName,

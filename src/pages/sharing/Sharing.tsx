@@ -77,7 +77,7 @@ const SharingScreen = (props) => {
                 setIsAwaitingProgress(true);
             }
         } catch (err) {
-            Logger.log('Sharing', 'Error creating entry', err);
+            logger.errorlog('Sharing', 'Error creating entry', err);
             setSnackBarText('Unable to add this entry at this time!');
             setSnackBarVisible(true);
             setIsProcessingPodcast(false);

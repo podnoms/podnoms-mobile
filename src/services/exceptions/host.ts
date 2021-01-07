@@ -1,10 +1,11 @@
 import {setJSExceptionHandler} from 'react-native-exception-handler';
 import {Alert} from 'react-native';
 import RNRestart from 'react-native-restart';
-import Logger from '../logger';
+import {Logger} from'../logger';
+const logger = Logger.getInstance();
 
 const exceptionhandler = (e, isFatal) => {
-    Logger.error('Fatal host exception', e);
+    logger.error('Fatal host exception', e);
     if (isFatal) {
         Alert.alert(
             'Unexpected error occurred',
@@ -22,7 +23,7 @@ const exceptionhandler = (e, isFatal) => {
             ],
         );
     } else {
-        Logger.log(e); // So that we can see it in the ADB logs in case of Android if needed
+        logger.errorlog(e); // So that we can see it in the ADB logs in case of Android if needed
     }
 };
 export const createHostExceptionHandlers = () => {

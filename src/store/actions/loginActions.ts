@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import User from '../../model/User';
 import LoginService from '../../services/api/loginService';
-import Logger from '../../services/logger';
+import {Logger} from'../../services/logger';
 import {
     LOGIN_INIT_STARTED,
     LOGIN_INIT_SUCCESS,
@@ -31,7 +31,7 @@ const loginCheckStatus = () => {
                     dispatch(success(user));
                 }
             } else {
-                Logger.log('loginActions', 'No user stored');
+                logger.errorlog('loginActions', 'No user stored');
             }
         } catch (err) {
             dispatch(failure(err));
