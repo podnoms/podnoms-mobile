@@ -1,3 +1,4 @@
+import Logger from '../../services/logger';
 import {
     LOGIN_STARTED,
     LOGIN_REQUIRED,
@@ -48,7 +49,7 @@ export default function (prevState = initialState, action) {
                 isLoginError: false,
             };
         case LOGIN_FAILED:
-            console.log('loginReducer', 'LOGIN_FAILED', action);
+            Logger.log('loginReducer', 'LOGIN_FAILED', action);
             return {
                 ...prevState,
                 user: null,

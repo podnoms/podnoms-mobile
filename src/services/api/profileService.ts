@@ -1,4 +1,5 @@
 import { Profile } from '../../model/Profile';
+import Logger from '../logger';
 import ApiService from './apiService';
 
 class ProfileService extends ApiService {
@@ -11,7 +12,7 @@ class ProfileService extends ApiService {
                 return Profile.fromJson(response.data);
             }
         } catch (err) {
-            console.error('Exception fetching profile', err);
+            Logger.error('Exception fetching profile', err);
         }
         return null;
     };

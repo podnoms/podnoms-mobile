@@ -1,5 +1,6 @@
 import {Episode} from '../../model/Episode';
 import {Podcast} from '../../model/Podcast';
+import Logger from '../logger';
 import ApiService from './apiService';
 
 class PodcastService extends ApiService {
@@ -14,12 +15,12 @@ class PodcastService extends ApiService {
                 );
             }
         } catch (err) {
-            console.error('Exception fetching podcasts', err);
+            Logger.error('Exception fetching podcasts', err);
         }
         return [];
     };
     validateUrl = async (url: string): Promise<any> => {
-        console.log('podcastService', 'validateUrl', url);
+        Logger.log('podcastService', 'validateUrl', url);
         try {
             const client = await this.requestClient();
             const response = await client.get(
@@ -33,7 +34,7 @@ class PodcastService extends ApiService {
                 {}
             );
         } catch (err) {
-            console.error('podcastService', 'validateUrl', err);
+            Logger.error('podcastService', 'validateUrl', err);
             throw err;
         }
     };
@@ -42,7 +43,7 @@ class PodcastService extends ApiService {
         url: string,
         title: string,
     ): Promise<Episode> => {
-        console.log('podcastService', 'Creating client');
+        Logger.log('podcastService', 'Creating client');
         try {
             const client = await this.requestClient();
             const payload = {
@@ -53,16 +54,16 @@ class PodcastService extends ApiService {
                 description: '',
                 imageUrl: '',
             };
-            console.log('podcastService', 'Payload', payload);
+            Logger.log('podcastService', 'Payload', payload);
             const response = await client.post('/entry', payload);
-            console.log('podcastService', 'Response', response);
+            Logger.log('podcastService', 'Response', response);
             return (
                 response &&
                 response.status === 200 &&
                 Episode.fromJson(response.data)
             );
         } catch (err) {
-            console.error('podcastService', 'addPodcastEntry', err);
+            Logger.error('podcastService', 'addPodcastEntry', err);
             throw err;
         }
     };

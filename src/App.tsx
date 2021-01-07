@@ -1,5 +1,4 @@
 import React, {Component, useCallback} from 'react';
-
 import {useEffect, useMemo, useState} from 'react';
 import {Provider as StoreProvider, useSelector, useDispatch} from 'react-redux';
 import {Provider as PaperProvider, Text} from 'react-native-paper';
@@ -7,7 +6,6 @@ import {View} from 'react-native';
 
 import CustomDarkTheme from './themes/CustomDarkTheme';
 import CustomDefaultTheme from './themes/CustomDefaultTheme';
-import LoginStackScreen from './navigation/LoginStack';
 import store from './store';
 import {NavigationContainer} from '@react-navigation/native';
 import AppStackScreen from './navigation/AppStack';
@@ -15,6 +13,8 @@ import ThemeContext from './themes/themeContext';
 import {loginActions} from './store/actions/loginActions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ShareMenu from 'react-native-share-menu';
+import Logger from './services/logger';
+import LoginStackScreen from './navigation/LoginStack';
 
 type SharedItem = {
     mimeType: string;
@@ -33,7 +33,6 @@ class AppWrapper extends Component {
 }
 
 const LoginWrapper = () => {
-    const loginState = useSelector((state) => state.loginState);
     const dispatch = useDispatch();
 
     const [isDarkTheme, setIsDarkTheme] = useState(false);
@@ -79,6 +78,7 @@ const LoginWrapper = () => {
 };
 
 const ShareListener = () => {
+    const loginState = useSelector((state) => state.loginState);
     const [sharedData, setSharedData] = useState<string>();
     const [sharedMimeType, setSharedMimeType] = useState<string>();
 
@@ -92,7 +92,7 @@ const ShareListener = () => {
         setSharedData(data);
         setSharedMimeType(mimeType);
         // You can receive extra data from your custom Share View
-        console.log(extraData);
+        Logger.info(extraData);
     }, []);
 
     useEffect(() => {
@@ -109,10 +109,13 @@ const ShareListener = () => {
 
     if (!sharedMimeType && !sharedData) {
         // The user hasn't shared anything yet
-        return <AppStackScreen />;
-    }
-
-    if (sharedMimeType === 'text/plain') {
+        if (loginState.isLoggedIn) {
+            return <AppStackScreen />;
+        } else {
+            // return <AppStackScreen />;
+            return <LoginStackScreen />;
+        }
+    } else if (sharedMimeType === 'text/plain') {
         // The user shared text
         return <AppStackScreen shareUrl={sharedData} />;
     }

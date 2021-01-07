@@ -9,6 +9,7 @@ import getEnvVars from '../environment';
 import {Divider, Paragraph, ProgressBar, Text} from 'react-native-paper';
 import UserToken from '../model/UserToken';
 import {StyleSheet, View} from 'react-native';
+import {Logger} from '../services/logger';
 
 const {hubUrl} = getEnvVars();
 const getProcessingStatus = (status: number) => {
@@ -66,9 +67,9 @@ const ProcessingProgressControl = (props) => {
             return con;
         }
         if (props.episodeId) {
-            const con = await loadUserAndHub(props.episodeId);
+            loadUserAndHub(props.episodeId);
             return function cleanup() {
-                con.close();
+                // con.close();
             };
         }
     }, [props]);
@@ -105,7 +106,7 @@ const ProcessingProgressControl = (props) => {
         try {
             await connection.start();
         } catch (err) {
-            console.error(
+            Logger.error(
                 'ProcessingProgressControl',
                 'Error creating the SignalR connection',
                 err,
@@ -113,7 +114,7 @@ const ProcessingProgressControl = (props) => {
         }
 
         if (connection.state === HubConnectionState.Connected) {
-            console.log('ProcessingProgressControl', 'SignalR Hub - Connected');
+            Logger.log('ProcessingProgressControl', 'SignalR Hub - Connected');
         }
         return connection;
     };

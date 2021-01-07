@@ -13,15 +13,17 @@ class ApiService {
             maxRedirects: 0,
             headers: {'Content-Type': 'application/json'},
         });
-        const user = await UserToken.fromStorage();
-        if (user) {
-            instance.interceptors.request.use((config) => {
-                config.headers = {
-                    Authorization: `Bearer ${user.token}`,
-                };
-                return config;
-            });
-        }
+        try {
+            const user = await UserToken.fromStorage();
+            if (user) {
+                instance.interceptors.request.use((config) => {
+                    config.headers = {
+                        Authorization: `Bearer ${user.token}`,
+                    };
+                    return config;
+                });
+            }
+        } catch (err) {}
         return instance;
     };
 }
