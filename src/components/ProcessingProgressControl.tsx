@@ -62,16 +62,16 @@ const ProcessingProgressControl = (props) => {
         async function loadUserAndHub(episodeId) {
             const user = await UserToken.fromStorage();
             const con = await setUpSignalRConnection(user.token, episodeId);
-            console.log(
-                'ProcessingProgressControl',
-                'Hub started',
-                con.connectionId,
-            );
+
+            return con;
         }
         if (props.episodeId) {
-            loadUserAndHub(props.episodeId);
+            const con = await loadUserAndHub(props.episodeId);
+            return function cleanup() {
+                con.close();
+            };
         }
-    }, [props.episodeId]);
+    }, [props]);
 
     const setUpSignalRConnection = async (token: string, episodeId: string) => {
         const connection = new HubConnectionBuilder()
@@ -83,8 +83,8 @@ const ProcessingProgressControl = (props) => {
             .build();
 
         connection.on(episodeId, (result) => {
-            setProgressText(result.progress || status);
             const status = getProcessingStatus(result.processingStatus);
+            setProgressText(result.progress || status);
             setProcessingStatus(status);
             setIndeterminateProgress(false);
 

@@ -25,7 +25,6 @@ class PodcastService extends ApiService {
             const response = await client.get(
                 `/urlprocess/validate?url=${url}`,
             );
-            console.log('podcastService', 'response', response);
             return (
                 (response && {
                     type: response.data.type,
