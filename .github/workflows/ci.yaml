@@ -24,6 +24,8 @@ jobs:
               env:
                   RELEASE_KEYSTORE: ${{ secrets.RELEASE_KEYSTORE }}
                   PODNOMS_UPLOAD_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+              uses: mxschmitt/action-tmate@v3
+
 
             - name: Build Android Release
               env:
@@ -33,9 +35,6 @@ jobs:
                   cat release.keystore.asc
                   gpg -d --passphrase "${{ secrets.KEYSTORE_PASSWORD }}" --batch release.keystore.asc > android/app/podnoms.keystore
                   cd android && ./gradlew assembleRelease
-
-
-              uses: mxschmitt/action-tmate@v3
 
             - name: Upload Artifact
               uses: actions/upload-artifact@v1
