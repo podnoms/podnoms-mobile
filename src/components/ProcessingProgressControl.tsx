@@ -44,16 +44,19 @@ const ProcessingProgressControl = (props) => {
     const [progressText, setProgressText] = useState<string>(
         props.processMessage,
     );
+    const [showProgressBar, setShowProgressBar] = useState<boolean>(
+        props.showProgressBar,
+    );
 
     const [processingStatus, setProcessingStatus] = useState<string>(
         'Accepted',
     );
     const [percentageProcessed, setPercentageProcessed] = useState<number>(0);
-    const [progressVisible, setProgressVisible] = useState<boolean>(true);
 
     useEffect(() => {
         setProgressText(props.processMessage);
-    }, [props.processMessage]);
+        setShowProgressBar(props.showProgressBar);
+    }, [props.processMessage, props.showProgressBar]);
 
     useEffect(() => {
         async function loadUserAndHub(episodeId) {
@@ -94,7 +97,7 @@ const ProcessingProgressControl = (props) => {
                 // this.currentSpeed = result.payload.currentSpeed;
             } else if (status === 'Processed' || status === 'Failed') {
                 connection.stop();
-                setProgressVisible(false);
+                setShowProgressBar(false);
                 props.onEpisodeProcessed();
             }
         });
@@ -121,7 +124,7 @@ const ProcessingProgressControl = (props) => {
             <Divider />
             <ProgressBar
                 indeterminate={indeterminateProgress}
-                visible={progressVisible}
+                visible={showProgressBar}
                 progress={percentageProcessed / 100}
             />
         </View>

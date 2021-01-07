@@ -14,6 +14,7 @@ export class Podcast {
     createDate?: Date;
     notifications?: Array<Notification>;
 
+    title?: string;
     publicTitle?: string;
     facebookUrl?: string;
     twitterUrl?: string;
@@ -35,8 +36,10 @@ export class Podcast {
         const podcast: Podcast = new Podcast();
 
         podcast.id = json.id;
-        podcast.description = json.description;
-        podcast.strippedDescription = json.strippedDescription;
+        podcast.title = json.title;
+        podcast.createDate = json.createDate;
+        podcast.description = json.description || '';
+        podcast.strippedDescription = json.strippedDescription || '';
         podcast.slug = json.slug;
         podcast.imageUrl = json.imageUrl;
         podcast.thumbnailUrl = json.thumbnailUrl;

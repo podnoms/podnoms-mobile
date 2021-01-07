@@ -18,10 +18,25 @@ class PodcastService extends ApiService {
         }
         return [];
     };
-    validateUrl = async (url: string): Promise<boolean> => {
-        const client = await this.requestClient();
-        const response = await client.get(`/urlprocess/validate?url=${url}`);
-        return response && response.status === 200;
+    validateUrl = async (url: string): Promise<any> => {
+        console.log('podcastService', 'validateUrl', url);
+        try {
+            const client = await this.requestClient();
+            const response = await client.get(
+                `/urlprocess/validate?url=${url}`,
+            );
+            console.log('podcastService', 'response', response);
+            return (
+                (response && {
+                    type: response.data.type,
+                    title: response.data.links[0].title,
+                }) ||
+                {}
+            );
+        } catch (err) {
+            console.error('podcastService', 'validateUrl', err);
+            throw err;
+        }
     };
     addPodcastEntry = async (
         podcastId: string,
@@ -29,23 +44,28 @@ class PodcastService extends ApiService {
         title: string,
     ): Promise<Episode> => {
         console.log('podcastService', 'Creating client');
-        const client = await this.requestClient();
-        const payload = {
-            podcastId: podcastId,
-            sourceUrl: url,
-            processed: false,
-            title: title || 'New from PodNoms Mobile',
-            description: '',
-            imageUrl: '',
-        };
-        console.log('podcastService', 'Payload', payload);
-        const response = await client.post('/entry', payload);
-        console.log('podcastService', 'Response', response);
-        return (
-            response &&
-            response.status === 200 &&
-            Episode.fromJson(response.data)
-        );
+        try {
+            const client = await this.requestClient();
+            const payload = {
+                podcastId: podcastId,
+                sourceUrl: url,
+                processed: false,
+                title: title || 'New from PodNoms Mobile',
+                description: '',
+                imageUrl: '',
+            };
+            console.log('podcastService', 'Payload', payload);
+            const response = await client.post('/entry', payload);
+            console.log('podcastService', 'Response', response);
+            return (
+                response &&
+                response.status === 200 &&
+                Episode.fromJson(response.data)
+            );
+        } catch (err) {
+            console.error('podcastService', 'addPodcastEntry', err);
+            throw err;
+        }
     };
 }
 

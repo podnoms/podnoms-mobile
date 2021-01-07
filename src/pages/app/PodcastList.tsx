@@ -39,7 +39,7 @@ const PodcastListScreen = ({navigation}) => {
                     podcasts.map((p) => (
                         <List.Item
                             key={p.id}
-                            title={p.publicTitle}
+                            title={p.title}
                             description={`${p.strippedDescription || ''}\n${
                                 p.createDate
                             }`}
