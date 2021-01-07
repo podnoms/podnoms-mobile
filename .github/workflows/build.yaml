@@ -21,13 +21,13 @@ jobs:
             #   run: |
             #       npm install
 
-            - name: Build Android Release
-              env:
-                  PODNOMS_UPLOAD_STORE_PASSWORD: ${{ secrets.SuperSecret }}
-              run: |
-                  echo "{{ secrets.RELEASE_KEYSTORE }}" > release.keystore.asc
-                  gpg -d --passphrase "${{ secrets.KEYSTORE_PASSWORD }}" --batch release.keystore.asc > app/podnoms.keystore
-                  cd android && ./gradlew assembleRelease
+            # - name: Build Android Release
+            #   env:
+            #       PODNOMS_UPLOAD_STORE_PASSWORD: ${{ secrets.SuperSecret }}
+            #   run: |
+            #       echo "{{ secrets.RELEASE_KEYSTORE }}" > release.keystore.asc
+            #       gpg -d --passphrase "${{ secrets.KEYSTORE_PASSWORD }}" --batch release.keystore.asc > app/podnoms.keystore
+            #       cd android && ./gradlew assembleRelease
 
             - name: Setup tmate session
               env:
