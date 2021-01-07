@@ -59,6 +59,7 @@ const ProcessingProgressControl = (props) => {
     }, [props.processMessage, props.showProgressBar]);
 
     useEffect(() => {
+        const hubAbortController = new AbortController();
         async function loadUserAndHub(episodeId) {
             const user = await UserToken.fromStorage();
             const con = await setUpSignalRConnection(user.token, episodeId);
@@ -66,11 +67,14 @@ const ProcessingProgressControl = (props) => {
             return con;
         }
         if (props.episodeId) {
-            const con = await loadUserAndHub(props.episodeId);
+            const con = loadUserAndHub(props.episodeId);
             return function cleanup() {
                 con.close();
             };
         }
+        return () => {
+            hubAbortController.abort();
+        };
     }, [props]);
 
     const setUpSignalRConnection = async (token: string, episodeId: string) => {

@@ -29,11 +29,11 @@ jobs:
 
             - name: Build Android Release
               env:
+                  RELEASE_KEYSTORE: ${{ secrets.RELEASE_KEYSTORE }}
                   PODNOMS_UPLOAD_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
               run: |
-                  echo "$PODNOMS_UPLOAD_STORE_PASSWORD" > release.keystore.asc
-                  cat release.keystore.asc
-                  gpg -d --passphrase "${{ secrets.KEYSTORE_PASSWORD }}" --batch release.keystore.asc > android/app/podnoms.keystore
+                  echo "$RELEASE_KEYSTORE" > release.keystore.asc
+                  gpg -d --passphrase "$PODNOMS_UPLOAD_STORE_PASSWORD" --batch release.keystore.asc > android/app/podnoms.keystore
                   cd android && ./gradlew assembleRelease
 
             - name: Upload Artifact
