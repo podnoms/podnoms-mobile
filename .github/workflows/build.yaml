@@ -25,7 +25,7 @@ jobs:
               env:
                   PODNOMS_UPLOAD_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
               run: |
-                  echo "{{ secrets.RELEASE_KEYSTORE }}" > release.keystore.asc
+                  echo "$PODNOMS_UPLOAD_STORE_PASSWORD" > release.keystore.asc
                   gpg -d --passphrase "${{ secrets.KEYSTORE_PASSWORD }}" --batch release.keystore.asc > android/app/podnoms.keystore
                   cd android && ./gradlew assembleRelease
 
