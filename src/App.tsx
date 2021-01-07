@@ -2,7 +2,8 @@ import React, {Component, useCallback} from 'react';
 
 import {useEffect, useMemo, useState} from 'react';
 import {Provider as StoreProvider, useSelector, useDispatch} from 'react-redux';
-import {Provider as PaperProvider} from 'react-native-paper';
+import {Provider as PaperProvider, Text} from 'react-native-paper';
+import {View} from 'react-native';
 
 import CustomDarkTheme from './themes/CustomDarkTheme';
 import CustomDefaultTheme from './themes/CustomDefaultTheme';
@@ -13,77 +14,34 @@ import AppStackScreen from './navigation/AppStack';
 import ThemeContext from './themes/themeContext';
 import {loginActions} from './store/actions/loginActions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import ShareMenu, {ShareMenuReactView} from 'react-native-share-menu';
+import ShareMenu from 'react-native-share-menu';
 
 type SharedItem = {
     mimeType: string;
     data: string;
     extraData: any;
 };
-import {AppState} from 'react-native';
 
 class AppWrapper extends Component {
     render() {
         return (
             <StoreProvider store={store}>
-                <App />
+                <LoginWrapper />
             </StoreProvider>
         );
     }
 }
 
-function App() {
+const LoginWrapper = () => {
     const loginState = useSelector((state) => state.loginState);
     const dispatch = useDispatch();
 
     const [isDarkTheme, setIsDarkTheme] = useState(false);
     const theme = isDarkTheme ? CustomDarkTheme : CustomDefaultTheme;
 
-    const [shareUrl, setShareUrl] = useState<string>(null);
-    const [sharedMimeType, setSharedMimeType] = useState<string>(null);
-
-    const handleShare = useCallback((item: SharedItem) => {
-        console.log('App', 'handleShare', item);
-        if (!item) {
-            return;
-        }
-
-        const {mimeType, data} = item;
-
-        console.log('App', 'data', data);
-        console.log('App', 'mimeType', mimeType);
-
-        setShareUrl(data);
-        setSharedMimeType(mimeType);
-    }, []);
-
-    useEffect(() => {
-        ShareMenu.getInitialShare(handleShare);
-    }, []);
-
-    useEffect(() => {
-        const listener = ShareMenu.addNewShareListener(handleShare);
-
-        return () => {
-            listener.remove();
-        };
-    }, []);
-
     useEffect(() => {
         dispatch(loginActions.loginCheckStatus());
     }, [dispatch]);
-
-    useEffect(() => {
-        AppState.addEventListener('change', handleChange);
-
-        return () => {
-            AppState.removeEventListener('change', handleChange);
-        };
-    }, []);
-
-    const handleChange = (newState) => {
-        console.log('App', 'HandleChange', newState);
-    };
 
     useEffect(() => {
         async function loadTheme() {
@@ -109,23 +67,62 @@ function App() {
         [isDarkTheme],
     );
 
-    const renderInner = () => {
-        if (loginState.isLoggedIn) {
-            return <AppStackScreen shareUrl={shareUrl} />;
-        } else {
-            // return <AppStackScreen />;
-            return <LoginStackScreen />;
-        }
-    };
     return (
         <PaperProvider theme={theme}>
             <ThemeContext.Provider value={themeContext}>
                 <NavigationContainer theme={theme}>
-                    {renderInner()}
+                    <ShareListener />
                 </NavigationContainer>
             </ThemeContext.Provider>
         </PaperProvider>
     );
-}
+};
+
+const ShareListener = () => {
+    const [sharedData, setSharedData] = useState<string>();
+    const [sharedMimeType, setSharedMimeType] = useState<string>();
+
+    const handleShare = useCallback((item: SharedItem) => {
+        if (!item) {
+            return;
+        }
+
+        const {mimeType, data, extraData} = item;
+
+        setSharedData(data);
+        setSharedMimeType(mimeType);
+        // You can receive extra data from your custom Share View
+        console.log(extraData);
+    }, []);
+
+    useEffect(() => {
+        ShareMenu.getInitialShare(handleShare);
+    }, []);
+
+    useEffect(() => {
+        const listener = ShareMenu.addNewShareListener(handleShare);
+
+        return () => {
+            listener.remove();
+        };
+    }, []);
+
+    if (!sharedMimeType && !sharedData) {
+        // The user hasn't shared anything yet
+        return <AppStackScreen />;
+    }
+
+    if (sharedMimeType === 'text/plain') {
+        // The user shared text
+        return <AppStackScreen shareUrl={sharedData} />;
+    }
+
+    return (
+        <View>
+            <Text>Shared mime type: {sharedMimeType}</Text>
+            <Text>Shared file location: {sharedData}</Text>
+        </View>
+    );
+};
 
 export default AppWrapper;
