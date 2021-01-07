@@ -1,5 +1,15 @@
 import PodcastService from '../../services/api/podcastService';
-import {LOAD_PODCASTS_ERROR, LOAD_PODCASTS_STARTED, LOAD_PODCASTS_SUCCESS, ADD_PODCASTENTRY_STARTED, ADD_PODCASTENTRY_SUCCESS, ADD_PODCASTENTRY_ERROR, LOAD_PODCASTENTRIES_STARTED, LOAD_PODCASTENTRIES_SUCCESS, LOAD_PODCASTENTRIES_ERROR} from '../types';
+import {
+    LOAD_PODCASTS_ERROR,
+    LOAD_PODCASTS_STARTED,
+    LOAD_PODCASTS_SUCCESS,
+    ADD_PODCASTENTRY_STARTED,
+    ADD_PODCASTENTRY_SUCCESS,
+    ADD_PODCASTENTRY_ERROR,
+    LOAD_PODCASTENTRIES_STARTED,
+    LOAD_PODCASTENTRIES_SUCCESS,
+    LOAD_PODCASTENTRIES_ERROR,
+} from '../types';
 
 import {logger} from 'react-native-logs';
 var log = logger.createLogger();
@@ -57,7 +67,6 @@ const addPodcastEntry = (podcastId: string, url: string) => {
 
 const getEntries = (podcastId: string) => {
     return async function (dispatch: any, getState: any) {
-
         try {
             dispatch(request());
             const res = await service.getEntries(podcastId);

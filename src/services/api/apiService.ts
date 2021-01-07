@@ -13,9 +13,8 @@ class ApiService {
             maxRedirects: 0,
             headers: {'Content-Type': 'application/json'},
         });
-        const stored = await AsyncStorage.getItem('user');
-        if (stored) {
-            const user = UserToken.fromStorage(JSON.parse(stored));
+        const user = await UserToken.fromStorage();
+        if (user) {
             instance.interceptors.request.use((config) => {
                 config.headers = {
                     Authorization: `Bearer ${user.token}`,

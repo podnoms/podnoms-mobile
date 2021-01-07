@@ -15,7 +15,7 @@ npx react-native bundle \
     --assets-dest android/app/src/main/res/
 
 echo "Creating release"
-cd android && ./gradlew assembleRelease
+cd android && ./gradlew assembleRelease && ./gradlew bundleRelease
 
 echo "Uploading to web"
 ARTEFACT="$HOME/dev/podnoms/podnoms-mobile/android/app/build/outputs/apk/release/app-release.apk"

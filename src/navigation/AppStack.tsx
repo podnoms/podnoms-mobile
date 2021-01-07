@@ -20,12 +20,11 @@ const AppStackScreen = (props) => {
         <AppStack.Screen name="SharingScreen">
             {(screenProps) => <SharingScreen shareUrl={props.shareUrl} />}
         </AppStack.Screen>
-    ) : (
-        <AppStack.Screen name="DefaultApp" component={DefaultAppScreen} />
-    );
+    ) : null;
     return (
         <AppStack.Navigator headerMode="none">
             {content}
+            <AppStack.Screen name="DefaultApp" component={DefaultAppScreen} />
             <AppStack.Screen
                 name="Debug"
                 component={DebugScreen}></AppStack.Screen>

@@ -15,13 +15,13 @@ import * as Animatable from 'react-native-animatable';
 import LinearGradient from 'react-native-linear-gradient';
 import FontAwesome from 'react-native-vector-icons/dist/FontAwesome';
 import Feather from 'react-native-vector-icons/dist/Feather';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
-import {useTheme} from 'react-native-paper';
+import {Snackbar, useTheme} from 'react-native-paper';
 
 import LoginService from '../../services/api/loginService';
 import {loginActions} from '../../store/actions/loginActions';
-
+import AntDesign from 'react-native-vector-icons/AntDesign';
 const LoginScreen = ({navigation: {navigate}}) => {
     const [data, setData] = useState({
         username: __DEV__ ? 'fergal.moran+testharness@gmail.com' : '',
@@ -32,7 +32,7 @@ const LoginScreen = ({navigation: {navigate}}) => {
         isValidPassword: true,
     });
     const dispatch = useDispatch();
-
+    const [loginError, setLoginError] = useState<boolean>(false);
     const {colors} = useTheme();
 
     const loginService: LoginService = new LoginService();
@@ -107,7 +107,7 @@ const LoginScreen = ({navigation: {navigate}}) => {
             Alert.alert('Invalid User!', 'Username or password is incorrect.', [
                 {text: 'Okay'},
             ]);
-            navigate('Debug');
+            setLoginError(true);
             return;
         }
         console.log('Login', 'dispatchingAction');
@@ -222,6 +222,19 @@ const LoginScreen = ({navigation: {navigate}}) => {
                 </TouchableOpacity>
                 <View style={styles.button}>
                     <TouchableOpacity
+                        onPress={() => {
+                            loginHandle(data.username, data.password);
+                        }}>
+                        <LinearGradient
+                            colors={['#08d4c4', '#01ab9d']}
+                            style={styles.signIn}>
+                            <Text style={styles.textSign}>Login</Text>
+                            <AntDesign name="login" color="#fff" size={15} />
+                        </LinearGradient>
+                    </TouchableOpacity>
+                </View>
+                {/* <View style={styles.button}>
+                    <TouchableOpacity
                         style={styles.signIn}
                         onPress={() => {
                             loginHandle(data.username, data.password);
@@ -238,10 +251,26 @@ const LoginScreen = ({navigation: {navigate}}) => {
                                 ]}>
                                 Sign In
                             </Text>
+                            <MaterialIcons
+                                name="login-variant"
+                                color="#fff"
+                                size={20}
+                            />
                         </LinearGradient>
                     </TouchableOpacity>
-                </View>
+                </View> */}
             </Animatable.View>
+            <Snackbar
+                visible={loginError}
+                onDismiss={() => setLoginError(false)}
+                action={{
+                    label: 'OK',
+                    onPress: () => {
+                        setLoginError(false);
+                    },
+                }}>
+                Unable to log you in at this time.
+            </Snackbar>
         </View>
     );
 };
@@ -301,18 +330,20 @@ const styles = StyleSheet.create({
         fontSize: 14,
     },
     button: {
-        alignItems: 'center',
-        marginTop: 50,
+        alignItems: 'flex-end',
+        marginTop: 30,
     },
     signIn: {
-        width: '100%',
-        height: 50,
+        width: 150,
+        height: 40,
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 10,
+        borderRadius: 50,
+        flexDirection: 'row',
     },
     textSign: {
-        fontSize: 18,
+        color: 'white',
         fontWeight: 'bold',
+        marginRight: 5,
     },
 });

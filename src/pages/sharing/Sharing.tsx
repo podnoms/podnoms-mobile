@@ -6,7 +6,15 @@ import {
     StatusBar,
     Dimensions,
 } from 'react-native';
-import {Snackbar, Text, TextInput} from 'react-native-paper';
+import {
+    ActivityIndicator,
+    Banner,
+    Button,
+    Colors,
+    Snackbar,
+    Text,
+    TextInput,
+} from 'react-native-paper';
 import {useTheme} from 'react-native-paper';
 import * as Animatable from 'react-native-animatable';
 import LinearGradient from 'react-native-linear-gradient';
@@ -17,68 +25,103 @@ import {podcastActions} from '../../store/actions/podcastActions';
 import DropDownPicker from 'react-native-dropdown-picker';
 import PodcastService from '../../services/api/podcastService';
 import {navigate} from '../../navigation/rootNavigator';
+import ProcessingProgressControl from '../../components/ProcessingProgressControl';
 
 const SharingScreen = (props) => {
     const {colors} = useTheme();
     const podcasts = useSelector((state) => state.podcastState.podcasts);
+    const [processMessage, setProcessMessage] = useState<string>(
+        'Ready to upload',
+    );
+    const [isValidUrl, setIsValidUrl] = useState(false);
     const [selectedPodcast, setSelectedPodcast] = useState<any>();
+    const [isProcessingPodcast, setIsProcessingPodcast] = useState<boolean>(
+        false,
+    );
+    const [isAwaitingProgress, setIsAwaitingProgress] = useState<boolean>(
+        false,
+    );
+
     const [podcastTitle, setPodcastTitle] = useState<string>(
         props.sourceTitle || 'New from PodNoms Mobile',
     );
-    const [snackBarVisible, setSnackBarVisible] = React.useState<boolean>(
-        false,
-    );
-    const [snackBarText, setSnackBarText] = React.useState<string>(
+    const [snackBarVisible, setSnackBarVisible] = useState<boolean>(false);
+    const [snackBarText, setSnackBarText] = useState<string>(
         'New from PodNoms Mobile',
     );
+    const [episodeId, setEpisodeId] = useState<string>('');
+    const [episodeProcessed, setEpisodeProcessed] = useState<boolean>(false);
 
     const dispatch = useDispatch();
 
     const sendToPodcast = async () => {
-        if (!selectedPodcast) {
-            setSnackBarText('Please select a Podcast first');
-            setSnackBarVisible(true);
-            return;
-        }
-        console.log('Sharing', 'sendToPodacst', 'Creating service');
-        const service = new PodcastService();
-        console.log('Sharing', 'sendToPodacst', 'Validatating', props.shareUrl);
-        const valid = await service.validateUrl(props.shareUrl);
-        if (!valid) {
+        try {
+            if (!selectedPodcast) {
+                setSnackBarText('Please select a Podcast first');
+                setSnackBarVisible(true);
+                return;
+            }
+            console.log('Sharing', 'sendToPodacst', 'Creating service');
+            const service = new PodcastService();
             console.log(
                 'Sharing',
                 'sendToPodacst',
                 'Validatating',
-                'URL is not valid',
+                props.shareUrl,
             );
-            setSnackBarText("This doesn't look like a URL we can manage!");
-            setSnackBarVisible(true);
-            return;
-        }
-        console.log('Sharing', 'sendToPodacst', 'Validatating', 'URL is valid');
-        try {
-            const result = await service.addPodcastEntry(
+            console.log(
+                'Sharing',
+                'sendToPodacst',
+                'Validatating',
+                'URL is valid',
+            );
+            const episode = await service.addPodcastEntry(
                 selectedPodcast.value,
                 props.shareUrl,
                 podcastTitle,
             );
-            if (result) {
-                setSnackBarText(
-                    'Entry successfully added, visit podnoms.com to view progress!',
-                );
-                setSnackBarVisible(true);
-                return;
+            if (episode && episode.id) {
+                setProcessMessage('Waiting for server processing');
+                setEpisodeId(episode.id);
+                setIsAwaitingProgress(true);
             }
         } catch (err) {
             console.log('Sharing', 'Error creating entry', err);
+            setSnackBarText('Unable to add this entry at this time!');
+            setSnackBarVisible(true);
+            setIsProcessingPodcast(false);
+            setIsAwaitingProgress(false);
         }
-        setSnackBarText('Unable to add this entry at this time!');
-        setSnackBarVisible(true);
     };
+
+    useEffect(() => {
+        async function checkForValidUrl(url) {
+            const service = new PodcastService();
+            const valid = await service.validateUrl(url);
+            if (!valid) {
+                console.log(
+                    'Sharing',
+                    'sendToPodacst',
+                    'Validatating',
+                    'URL is not valid',
+                );
+                setSnackBarText("This doesn't look like a URL we can manage!");
+                setSnackBarVisible(true);
+                setIsValidUrl(false);
+            }
+        }
+        if (props.shareUrl) {
+            checkForValidUrl(props.shareUrl);
+        }
+    }, [props.shareUrl]);
 
     useEffect(() => {
         dispatch(podcastActions.getPodcasts());
     }, [dispatch]);
+
+    const gemmeOuttaHere = () => {
+        navigate('DefaultApp', null);
+    };
 
     return (
         <View style={styles.container}>
@@ -124,6 +167,7 @@ const SharingScreen = (props) => {
                     containerStyle={styles.dropdownContainer}
                     style={styles.dropdown}
                     dropDownStyle={styles.dropdown}
+                    dropDownMaxHeight={styles.dropdown.height}
                     onChangeItem={(item) => setSelectedPodcast(item)}
                 />
                 <TextInput
@@ -134,31 +178,55 @@ const SharingScreen = (props) => {
                     value={podcastTitle}
                     onChangeText={(title) => setPodcastTitle(title)}
                 />
-                <View style={styles.button}>
-                    <TouchableOpacity
+                {!isAwaitingProgress && !episodeProcessed ? (
+                    <Button
+                        style={styles.button}
+                        color={colors.accent}
+                        mode="contained"
+                        loading={isProcessingPodcast}
+                        disabled={
+                            isProcessingPodcast ||
+                            isAwaitingProgress ||
+                            episodeProcessed
+                        }
                         onPress={() => {
-                            sendToPodcast();
+                            setIsProcessingPodcast(true);
+                            setTimeout(() => {
+                                sendToPodcast();
+                            });
                         }}>
-                        <LinearGradient
-                            colors={['#08d4c4', '#01ab9d']}
-                            style={styles.sendButton}>
-                            <Text style={styles.textSign}>Send!</Text>
-                            <MaterialIcons
-                                name="navigate-next"
-                                color="#fff"
-                                size={20}
-                            />
-                        </LinearGradient>
-                    </TouchableOpacity>
+                        Send 2 PodNoms
+                    </Button>
+                ) : null}
+                <View style={styles.progressArea}>
+                    <ProcessingProgressControl
+                        processMessage={processMessage}
+                        onEpisodeProcessed={() => {
+                            setIsAwaitingProgress(false);
+                            setEpisodeProcessed(true);
+                        }}
+                        episodeId={episodeId}
+                    />
                 </View>
+                <Banner
+                    actions={[
+                        {
+                            label: 'OK',
+                            onPress: () => gemmeOuttaHere(),
+                        },
+                    ]}
+                    icon={require('../../../assets/happy-bot.png')}
+                    visible={episodeProcessed}>
+                    Episode succesfully sent to PodNoms!
+                </Banner>
             </Animatable.View>
             <Snackbar
                 visible={snackBarVisible}
                 onDismiss={() => setSnackBarVisible(false)}
                 action={{
-                    label: 'Undo',
+                    label: 'Ok',
                     onPress: () => {
-                        // Do something
+                        setSnackBarVisible(false);
                     },
                 }}
                 duration={Snackbar.DURATION_MEDIUM}>
@@ -184,6 +252,7 @@ const styles = StyleSheet.create({
     },
     dropdown: {
         backgroundColor: '#fafafa',
+        height: 320,
     },
     inputContainerStyle: {
         margin: 8,
@@ -192,6 +261,11 @@ const styles = StyleSheet.create({
         flex: 2,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    progressArea: {
+        flex: 2,
+        paddingVertical: 10,
+        paddingHorizontal: 10,
     },
     footer: {
         flex: 3,
@@ -215,7 +289,6 @@ const styles = StyleSheet.create({
         marginTop: 5,
     },
     button: {
-        alignItems: 'flex-end',
         marginTop: 30,
     },
     sendButton: {
