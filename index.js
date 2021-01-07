@@ -3,6 +3,8 @@ import React from 'react';
 import {AppRegistry, NativeModules} from 'react-native';
 import TrackPlayer from 'react-native-track-player';
 import {startNetworkLogging} from 'react-native-network-logger';
+import Reactotron from 'reactotron-react-native';
+
 import AppWrapper from './src/App';
 import {name as appName} from './app.json';
 const isHermes = () => !!global.HermesInternal;
@@ -13,6 +15,9 @@ log.debug('Bootstrapping application');
 
 if (__DEV__) {
     log.debug('index.js', 'Setting up dev tools');
+    import('./ReactotronConfig').then(() =>
+        console.log('Reactotron Configured'),
+    );
     startNetworkLogging();
     // NativeModules.DevSettings.setIsDebuggingRemotely(true);
 } else {

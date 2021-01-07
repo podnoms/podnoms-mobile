@@ -1,3 +1,4 @@
+import {Episode} from '../../model/Episode';
 import {Podcast} from '../../model/Podcast';
 import ApiService from './apiService';
 
@@ -17,7 +18,7 @@ class PodcastService extends ApiService {
         }
         return [];
     };
-    validateUrl = async (url: string): boolean => {
+    validateUrl = async (url: string): Promise<boolean> => {
         const client = await this.requestClient();
         const response = await client.get(`/urlprocess/validate?url=${url}`);
         return response && response.status === 200;
@@ -26,7 +27,7 @@ class PodcastService extends ApiService {
         podcastId: string,
         url: string,
         title: string,
-    ): Promise<boolean> => {
+    ): Promise<Episode> => {
         console.log('podcastService', 'Creating client');
         const client = await this.requestClient();
         const payload = {
@@ -40,7 +41,11 @@ class PodcastService extends ApiService {
         console.log('podcastService', 'Payload', payload);
         const response = await client.post('/entry', payload);
         console.log('podcastService', 'Response', response);
-        return response && response.status === 200;
+        return (
+            response &&
+            response.status === 200 &&
+            Episode.fromJson(response.data)
+        );
     };
 }
 

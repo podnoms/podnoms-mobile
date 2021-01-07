@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 export default class UserToken {
     id: string;
     slug: string;
@@ -19,14 +20,19 @@ export default class UserToken {
         this.refreshToken = refresh;
     }
 
-    static fromStorage(storage: any): UserToken {
-        return new UserToken(
-            storage.id,
-            storage.name,
-            storage.slug,
-            storage.token,
-            storage.refresh,
-        );
+    static async fromStorage(): Promise<UserToken> {
+        const stored = await AsyncStorage.getItem('user');
+        if (stored) {
+            const storage = JSON.parse(stored);
+            return new UserToken(
+                storage.id,
+                storage.name,
+                storage.slug,
+                storage.token,
+                storage.refresh,
+            );
+        }
+        throw 'No user token stored';
     }
     static fromJson(json: any): UserToken {
         return new UserToken(

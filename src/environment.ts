@@ -6,9 +6,11 @@ const localhost =
 const ENV = {
     dev: {
         apiUrl: localhost,
+        hubUrl: 'https://dev.pdnm.be:5001/hubs',
     },
     prod: {
         apiUrl: 'https://api.podnoms.com',
+        hubUrl: 'https://rt.podnoms.com/hubs',
     },
 };
 
