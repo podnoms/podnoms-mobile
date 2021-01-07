@@ -41,7 +41,7 @@ const PodcastListScreen = ({navigation}) => {
                             key={p.id}
                             title={p.title}
                             description={`${p.strippedDescription || ''}\n${
-                                p.createDate
+                                p.displayDate
                             }`}
                             onPress={() => switchView(p)}
                             left={() => (

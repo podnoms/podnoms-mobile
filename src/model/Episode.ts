@@ -1,3 +1,5 @@
+const {DateTime} = require('luxon');
+
 export class Episode {
     id?: string;
     title?: string;
@@ -9,6 +11,7 @@ export class Episode {
     thumbnailUrl?: string;
     processed: boolean = true;
     createDate?: Date;
+    displayDate?: string;
     processingStatus?: string;
     processingPayload?: string;
     podcastSlug?: string;
@@ -28,6 +31,7 @@ export class Episode {
         result.thumbnailUrl = json.thumbnailUrl;
         result.processed = json.processed;
         result.createDate = json.createDate;
+        result.displayDate = DateTime.fromISO(json.createDate).toLocaleString();
         result.processingStatus = json.processingStatus;
         result.processingPayload = json.processingPayload;
         result.podcastSlug = json.podcastSlug;
