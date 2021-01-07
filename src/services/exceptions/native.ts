@@ -1,5 +1,5 @@
 import {setNativeExceptionHandler} from 'react-native-exception-handler';
-import {Logger} from'../logger';
+import {Logger} from '../logger';
 const logger = Logger.getInstance();
 
 export const createNativeExceptionHandlers = () => {

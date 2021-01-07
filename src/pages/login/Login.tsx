@@ -20,7 +20,9 @@ import {Snackbar, useTheme} from 'react-native-paper';
 import LoginService from '../../services/api/loginService';
 import {loginActions} from '../../store/actions/loginActions';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import {Logger} from'../../services/logger';
+import {Logger} from '../../services/logger';
+const logger = Logger.getInstance();
+
 const LoginScreen = ({navigation: {navigate}}) => {
     const [data, setData] = useState({
         username: __DEV__ ? 'fergal.moran+testharness@gmail.com' : '',
@@ -109,7 +111,7 @@ const LoginScreen = ({navigation: {navigate}}) => {
             setLoginError(true);
             return;
         }
-        logger.errorlog('Login', 'dispatchingAction');
+        logger.error('Login', 'dispatchingAction');
         dispatch(loginActions.loginUser(userName, password));
     };
 

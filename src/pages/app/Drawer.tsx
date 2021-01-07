@@ -27,7 +27,7 @@ export function DrawerContent(props) {
         dispatch(loginActions.logoutUser());
     };
     return (
-        <View style={{flex: 1}}>
+        <View style={styles.containerStyle}>
             <DrawerContentScrollView {...props}>
                 <View style={styles.drawerContent}>
                     <View style={styles.userInfoSection}>
@@ -38,11 +38,7 @@ export function DrawerContent(props) {
                                 }}
                                 size={50}
                             />
-                            <View
-                                style={{
-                                    marginLeft: 15,
-                                    flexDirection: 'column',
-                                }}>
+                            <View style={styles.title}>
                                 <Title style={styles.title}>
                                     {profile?.name}
                                 </Title>
@@ -170,6 +166,10 @@ export function DrawerContent(props) {
 }
 
 const styles = StyleSheet.create({
+    containerStyle: {
+        flex: 1,
+    },
+
     drawerContent: {
         flex: 1,
     },

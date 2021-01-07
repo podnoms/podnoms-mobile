@@ -26,6 +26,9 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import PodcastService from '../../services/api/podcastService';
 import {navigate} from '../../navigation/rootNavigator';
 import ProcessingProgressControl from '../../components/ProcessingProgressControl';
+import {Logger} from '../../services/logger';
+
+const logger = Logger.getInstance();
 
 const SharingScreen = (props) => {
     const {colors} = useTheme();
@@ -77,7 +80,7 @@ const SharingScreen = (props) => {
                 setIsAwaitingProgress(true);
             }
         } catch (err) {
-            logger.errorlog('Sharing', 'Error creating entry', err);
+            logger.error('Sharing', 'Error creating entry', err);
             setSnackBarText('Unable to add this entry at this time!');
             setSnackBarVisible(true);
             setIsProcessingPodcast(false);

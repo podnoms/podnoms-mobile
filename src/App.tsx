@@ -14,8 +14,7 @@ import {loginActions} from './store/actions/loginActions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ShareMenu from 'react-native-share-menu';
 import LoginStackScreen from './navigation/LoginStack';
-import { Logger } from './services/logger';
-
+import {Logger} from './services/logger';
 
 const logger = Logger.getInstance();
 
@@ -52,6 +51,7 @@ const LoginWrapper = () => {
                 setIsDarkTheme(true);
             }
         }
+
         loadTheme();
     }, [isDarkTheme]);
 
@@ -63,7 +63,7 @@ const LoginWrapper = () => {
                     'isdark',
                     JSON.stringify(!isDarkTheme),
                 );
-                setIsDarkTheme((isDarkTheme) => !isDarkTheme);
+                setIsDarkTheme((t) => !t);
             },
         }),
         [isDarkTheme],
@@ -100,7 +100,7 @@ const ShareListener = () => {
 
     useEffect(() => {
         ShareMenu.getInitialShare(handleShare);
-    }, []);
+    }, [handleShare]);
 
     useEffect(() => {
         const listener = ShareMenu.addNewShareListener(handleShare);
@@ -108,7 +108,7 @@ const ShareListener = () => {
         return () => {
             listener.remove();
         };
-    }, []);
+    }, [handleShare]);
 
     if (!sharedMimeType && !sharedData) {
         // The user hasn't shared anything yet

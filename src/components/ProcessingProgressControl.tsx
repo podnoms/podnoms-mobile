@@ -119,7 +119,10 @@ const ProcessingProgressControl = (props) => {
         }
 
         if (connection.state === HubConnectionState.Connected) {
-            logger.errorlog('ProcessingProgressControl', 'SignalR Hub - Connected');
+            logger.error(
+                'ProcessingProgressControl',
+                'SignalR Hub - Connected',
+            );
         }
         return connection;
     };

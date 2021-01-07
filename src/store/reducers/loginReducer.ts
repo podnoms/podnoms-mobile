@@ -52,7 +52,7 @@ export default function (prevState = initialState, action) {
                 isLoginError: false,
             };
         case LOGIN_FAILED:
-            logger.errorlog('loginReducer', 'LOGIN_FAILED', action);
+            logger.error('loginReducer', 'LOGIN_FAILED', action);
             return {
                 ...prevState,
                 user: null,

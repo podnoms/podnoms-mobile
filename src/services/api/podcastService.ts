@@ -22,7 +22,7 @@ class PodcastService extends ApiService {
         return [];
     };
     validateUrl = async (url: string): Promise<any> => {
-        logger.errorlog('podcastService', 'validateUrl', url);
+        logger.error('podcastService', 'validateUrl', url);
         try {
             const client = await this.requestClient();
             const response = await client.get(
@@ -45,7 +45,7 @@ class PodcastService extends ApiService {
         url: string,
         title: string,
     ): Promise<Episode> => {
-        logger.errorlog('podcastService', 'Creating client');
+        logger.error('podcastService', 'Creating client');
         try {
             const client = await this.requestClient();
             const payload = {
@@ -56,9 +56,9 @@ class PodcastService extends ApiService {
                 description: '',
                 imageUrl: '',
             };
-            logger.errorlog('podcastService', 'Payload', payload);
+            logger.error('podcastService', 'Payload', payload);
             const response = await client.post('/entry', payload);
-            logger.errorlog('podcastService', 'Response', response);
+            logger.error('podcastService', 'Response', response);
             return (
                 response &&
                 response.status === 200 &&

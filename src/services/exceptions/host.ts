@@ -1,7 +1,7 @@
 import {setJSExceptionHandler} from 'react-native-exception-handler';
 import {Alert} from 'react-native';
 import RNRestart from 'react-native-restart';
-import {Logger} from'../logger';
+import {Logger} from '../logger';
 const logger = Logger.getInstance();
 
 const exceptionhandler = (e, isFatal) => {
@@ -23,7 +23,7 @@ const exceptionhandler = (e, isFatal) => {
             ],
         );
     } else {
-        logger.errorlog(e); // So that we can see it in the ADB logs in case of Android if needed
+        logger.error(e); // So that we can see it in the ADB logs in case of Android if needed
     }
 };
 export const createHostExceptionHandlers = () => {

@@ -1,8 +1,5 @@
-import React from 'react';
-
-import {AppRegistry, NativeModules} from 'react-native';
+import {AppRegistry} from 'react-native';
 import TrackPlayer from 'react-native-track-player';
-import Reactotron from 'reactotron-react-native';
 
 import AppWrapper from './src/App';
 import {name as appName} from './app.json';
@@ -21,7 +18,6 @@ logger.debug('index.js');
 if (__DEV__) {
     logger.debug('index.js', 'Setting up dev tools');
     import('./ReactotronConfig').then(() => {
-        // logger.errorlog('Reactotron Configured'),
         logger.log('index', 'Reactotron Configured');
     });
     // NativeModules.DevSettings.setIsDebuggingRemotely(true);

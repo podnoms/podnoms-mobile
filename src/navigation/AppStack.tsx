@@ -12,7 +12,7 @@ const logger = Logger.getInstance();
 const AppStack = createStackNavigator();
 
 const AppStackScreen = (props) => {
-    logger.errorlog('AppStack', 'props', props);
+    logger.error('AppStack', 'props', props);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -27,9 +27,7 @@ const AppStackScreen = (props) => {
         <AppStack.Navigator headerMode="none">
             {content}
             <AppStack.Screen name="DefaultApp" component={DefaultAppScreen} />
-            <AppStack.Screen
-                name="Debug"
-                component={DebugScreen}></AppStack.Screen>
+            <AppStack.Screen name="Debug" component={DebugScreen} />
         </AppStack.Navigator>
     );
 };

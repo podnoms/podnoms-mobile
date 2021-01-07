@@ -39,7 +39,7 @@ const getPodcasts = () => {
 };
 const addPodcastEntry = (podcastId: string, url: string) => {
     return async function (dispatch: any, getState: any) {
-        logger.errorlog(
+        logger.error(
             'podcastActions',
             'addPodcastEntry',
             `PodcastId: ${podcastId}`,

@@ -1,7 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import User from '../../model/User';
+import UserToken from '../../model/UserToken';
 import LoginService from '../../services/api/loginService';
-import {Logger} from'../../services/logger';
+import {Logger} from '../../services/logger';
+const logger = Logger.getInstance();
 import {
     LOGIN_INIT_STARTED,
     LOGIN_INIT_SUCCESS,
@@ -20,8 +22,7 @@ const loginCheckStatus = () => {
     return async function (dispatch: any, getState: any) {
         try {
             dispatch(request());
-            const t = await AsyncStorage.getItem('user');
-            const stored = User.fromStorage(JSON.parse(t));
+            const stored = await UserToken.fromStorage();
             if (stored) {
                 const user = await service.refreshToken(
                     stored?.token,
@@ -31,7 +32,7 @@ const loginCheckStatus = () => {
                     dispatch(success(user));
                 }
             } else {
-                logger.errorlog('loginActions', 'No user stored');
+                logger.error('loginActions', 'No user stored');
             }
         } catch (err) {
             dispatch(failure(err));

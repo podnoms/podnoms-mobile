@@ -9,14 +9,14 @@
 // });
 
 // const requestListener = function (req, res) {
-//     logger.errorlog('index', req.body);
+//     logger.error('index', req.body);
 //     res.writeHead(200);
 //     res.end('My first server!');
 // };
 
 // const server = http.createServer(requestListener);
 // server.listen(port, host, () => {
-//     logger.errorlog(`Server is running on http://${host}:${port}`);
+//     logger.error(`Server is running on http://${host}:${port}`);
 // });
 
 const express = require('express');

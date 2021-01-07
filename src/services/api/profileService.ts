@@ -1,5 +1,5 @@
-import { Profile } from '../../model/Profile';
-import {Logger} from'../logger';
+import {Profile} from '../../model/Profile';
+import {Logger} from '../logger';
 import ApiService from './apiService';
 const logger = Logger.getInstance();
 class ProfileService extends ApiService {

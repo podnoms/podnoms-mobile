@@ -52,5 +52,3 @@ export class Logger implements ILogger {
         this._tracker.push('podnoms-mobile', type, message, args);
     }
 }
-
-export const logging = new Logger();
