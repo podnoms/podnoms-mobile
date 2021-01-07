@@ -17,15 +17,18 @@ import {
 function ProgressBar() {
     const progress = useTrackPlayerProgress();
 
+    const progressPositionStyle = {
+        flex: progress.duration - progress.position,
+        backgroundColor: 'grey',
+    };
+    const progressPositionHeaderStyle = {
+        flex: progress.position,
+        backgroundColor: 'red',
+    };
     return (
         <View style={styles.progress}>
-            <View style={{flex: progress.position, backgroundColor: 'red'}} />
-            <View
-                style={{
-                    flex: progress.duration - progress.position,
-                    backgroundColor: 'grey',
-                }}
-            />
+            <View style={progressPositionHeaderStyle} />
+            <View style={progressPositionStyle} />
         </View>
     );
 }
@@ -50,11 +53,10 @@ const AudioPlayer = (props) => {
     const [trackTitle, setTrackTitle] = useState('');
     const [trackArtwork, setTrackArtwork] = useState();
     const [trackArtist, setTrackArtist] = useState('');
+    const events = useTrackPlayerEvents();
 
     useTrackPlayerEvents(['playback-track-changed'], async (event) => {
-        if (
-            event.type === TrackPlayer.TrackPlayerEvents.PLAYBACK_TRACK_CHANGED
-        ) {
+        if (event.type === events.PLAYBACK_TRACK_CHANGED) {
             const track = await TrackPlayer.getTrack(event.nextTrack);
             const {title, artist, artwork} = track || {};
             setTrackTitle(title);

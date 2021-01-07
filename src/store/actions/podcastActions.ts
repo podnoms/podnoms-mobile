@@ -1,4 +1,5 @@
 import PodcastService from '../../services/api/podcastService';
+import {Logger} from '../../services/logger';
 import {
     LOAD_PODCASTS_ERROR,
     LOAD_PODCASTS_STARTED,
@@ -11,8 +12,7 @@ import {
     LOAD_PODCASTENTRIES_ERROR,
 } from '../types';
 
-import {logger} from 'react-native-logs';
-var log = logger.createLogger();
+const logger = Logger.getInstance();
 
 const service = new PodcastService();
 const getPodcasts = () => {
@@ -23,7 +23,7 @@ const getPodcasts = () => {
             const res = await service.getPodcasts();
             dispatch(success(res));
         } catch (err) {
-            log.error('podcastActions', 'getPodcasts', err);
+            logger.error('podcastActions', 'getPodcasts', err);
             dispatch(failure(err));
         }
     };
@@ -39,7 +39,7 @@ const getPodcasts = () => {
 };
 const addPodcastEntry = (podcastId: string, url: string) => {
     return async function (dispatch: any, getState: any) {
-        console.log(
+        logger.error(
             'podcastActions',
             'addPodcastEntry',
             `PodcastId: ${podcastId}`,
@@ -50,7 +50,7 @@ const addPodcastEntry = (podcastId: string, url: string) => {
             const res = await service.addPodcastEntry(podcastId, url);
             dispatch(success(res));
         } catch (err) {
-            log.error('podcastActions', 'getPodcasts', err);
+            logger.error('podcastActions', 'getPodcasts', err);
             dispatch(failure(err));
         }
     };
@@ -72,7 +72,7 @@ const getEntries = (podcastId: string) => {
             const res = await service.getEntries(podcastId);
             dispatch(success(res));
         } catch (err) {
-            log.error('podcastActions', 'getPodcasts', err);
+            logger.error('podcastActions', 'getPodcasts', err);
             dispatch(failure(err));
         }
     };

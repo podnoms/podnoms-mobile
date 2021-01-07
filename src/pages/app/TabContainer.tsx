@@ -100,7 +100,8 @@ const DebugStackScreen = ({navigation}) => (
                         name="ios-menu"
                         size={25}
                         backgroundColor="#009387"
-                        onPress={() => navigation.openDrawer()}></Icon.Button>
+                        onPress={() => navigation.openDrawer()}
+                    />
                 ),
             }}
         />

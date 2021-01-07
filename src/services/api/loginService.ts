@@ -1,6 +1,8 @@
 import UserToken from '../../model/UserToken';
 import ApiService from './apiService';
-import {logger} from 'react-native-logs';
+import {Logger} from '../../services/logger';
+
+const logger = Logger.getInstance();
 
 class LoginService extends ApiService {
     loginUser = async (userName: string, password: string) => {
@@ -17,13 +19,12 @@ class LoginService extends ApiService {
                 return UserToken.fromJson(response.data);
             }
         } catch (err) {
-            console.error('Exception validating user', err);
+            logger.error('Exception validating user', err);
         }
         return null;
     };
 
     refreshToken = async (accessToken: string, refreshToken: string) => {
-
         const client = await this.requestClient();
         const payload = {
             accessToken: accessToken,
@@ -35,7 +36,7 @@ class LoginService extends ApiService {
                 return UserToken.fromJson(response.data);
             }
         } catch (err) {
-            console.error('Exception validating user', err);
+            logger.error('Exception validating user', err);
         }
         return null;
     };

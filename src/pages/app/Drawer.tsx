@@ -27,24 +27,20 @@ export function DrawerContent(props) {
         dispatch(loginActions.logoutUser());
     };
     return (
-        <View style={{flex: 1}}>
+        <View style={styles.containerStyle}>
             <DrawerContentScrollView {...props}>
                 <View style={styles.drawerContent}>
                     <View style={styles.userInfoSection}>
                         <View style={{flexDirection: 'row', marginTop: 15}}>
                             <Avatar.Image
                                 source={{
-                                    uri: profile.thumbnailImageUrl,
+                                    uri: profile?.thumbnailImageUrl,
                                 }}
                                 size={50}
                             />
-                            <View
-                                style={{
-                                    marginLeft: 15,
-                                    flexDirection: 'column',
-                                }}>
+                            <View style={styles.title}>
                                 <Title style={styles.title}>
-                                    {profile.name}
+                                    {profile?.name}
                                 </Title>
                                 <Caption style={styles.caption}>@j_doe</Caption>
                             </View>
@@ -54,7 +50,7 @@ export function DrawerContent(props) {
                             <View style={styles.section}>
                                 <Paragraph
                                     style={[styles.paragraph, styles.caption]}>
-                                    {profile.podcastCount}
+                                    {profile?.podcastCount}
                                 </Paragraph>
                                 <Caption style={styles.caption}>
                                     Podcasts
@@ -63,7 +59,7 @@ export function DrawerContent(props) {
                             <View style={styles.section}>
                                 <Paragraph
                                     style={[styles.paragraph, styles.caption]}>
-                                    {profile.episodeCount}
+                                    {profile?.episodeCount}
                                 </Paragraph>
                                 <Caption style={styles.caption}>
                                     Episodes
@@ -170,6 +166,10 @@ export function DrawerContent(props) {
 }
 
 const styles = StyleSheet.create({
+    containerStyle: {
+        flex: 1,
+    },
+
     drawerContent: {
         flex: 1,
     },
