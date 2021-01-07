@@ -34,7 +34,7 @@ export function DrawerContent(props) {
                         <View style={{flexDirection: 'row', marginTop: 15}}>
                             <Avatar.Image
                                 source={{
-                                    uri: profile.thumbnailImageUrl,
+                                    uri: profile?.thumbnailImageUrl,
                                 }}
                                 size={50}
                             />
@@ -44,7 +44,7 @@ export function DrawerContent(props) {
                                     flexDirection: 'column',
                                 }}>
                                 <Title style={styles.title}>
-                                    {profile.name}
+                                    {profile?.name}
                                 </Title>
                                 <Caption style={styles.caption}>@j_doe</Caption>
                             </View>
@@ -54,7 +54,7 @@ export function DrawerContent(props) {
                             <View style={styles.section}>
                                 <Paragraph
                                     style={[styles.paragraph, styles.caption]}>
-                                    {profile.podcastCount}
+                                    {profile?.podcastCount}
                                 </Paragraph>
                                 <Caption style={styles.caption}>
                                     Podcasts
@@ -63,7 +63,7 @@ export function DrawerContent(props) {
                             <View style={styles.section}>
                                 <Paragraph
                                     style={[styles.paragraph, styles.caption]}>
-                                    {profile.episodeCount}
+                                    {profile?.episodeCount}
                                 </Paragraph>
                                 <Caption style={styles.caption}>
                                     Episodes
