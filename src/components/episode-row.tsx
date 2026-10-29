@@ -1,3 +1,4 @@
+import { router } from 'expo-router'
 import { Pause, Play, RotateCcw, Trash2 } from 'lucide-react-native'
 import { Alert, Pressable, View } from 'react-native'
 import { Artwork } from '@/components/artwork'
@@ -11,8 +12,9 @@ import type { Episode, Podcast } from '@/lib/api-types'
 import { describeProgress, formatDate, formatDuration } from '@/lib/format'
 import { usePlayer } from '@/lib/player'
 
-// One of the user's episodes: play it when it's ready, see how it's coming
-// along while it's being made, and retry or delete it when that failed.
+// One of the user's episodes: opens its page (with comments), plays it from
+// its button when it's ready, shows how it's coming along while it's being
+// made, and can be retried or deleted when that failed.
 export function EpisodeRow({ episode, podcast }: { episode: Episode; podcast: Podcast }) {
   const player = usePlayer()
   const retry = useRetryEpisode()
@@ -25,7 +27,7 @@ export function EpisodeRow({ episode, podcast }: { episode: Episode; podcast: Po
   const listened =
     episode.durationSeconds && episode.positionSeconds ? episode.positionSeconds / episode.durationSeconds : 0
 
-  function onPress() {
+  function playOrPause() {
     if (!playable) return
     if (isCurrent) return player.toggle()
     player.play({
@@ -48,11 +50,10 @@ export function EpisodeRow({ episode, podcast }: { episode: Episode; podcast: Po
 
   return (
     <Pressable
-      onPress={onPress}
-      disabled={!playable}
+      onPress={() => router.push({ pathname: '/episodes/[id]', params: { id: episode.id } })}
       className="gap-2 border-b border-border px-4 py-3 active:bg-muted"
-      accessibilityRole={playable ? 'button' : undefined}
-      accessibilityLabel={playable ? `${isPlaying ? 'Pause' : 'Play'} ${episode.title}` : undefined}>
+      accessibilityRole="link"
+      accessibilityLabel={episode.title}>
       <View className="flex-row gap-3">
         <Artwork uri={episode.imageUrl ?? podcast.imageUrl} size={56} />
         <View className="flex-1 gap-1">
@@ -69,9 +70,13 @@ export function EpisodeRow({ episode, podcast }: { episode: Episode; podcast: Po
           </View>
         </View>
         {playable && (
-          <View className="h-10 w-10 items-center justify-center self-center rounded-full bg-primary">
+          <Pressable
+            onPress={playOrPause}
+            hitSlop={8}
+            className="h-10 w-10 items-center justify-center self-center rounded-full bg-primary active:opacity-80"
+            accessibilityLabel={`${isPlaying ? 'Pause' : 'Play'} ${episode.title}`}>
             <Icon as={isPlaying ? Pause : Play} size={18} className="text-primary-foreground" />
-          </View>
+          </Pressable>
         )}
       </View>
       {playable && listened > 0 && <Progress value={listened * 100} className="h-1" />}

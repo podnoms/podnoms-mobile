@@ -1,3 +1,4 @@
+import { router } from 'expo-router'
 import { Play } from 'lucide-react-native'
 import { FlatList, Pressable, RefreshControl, View } from 'react-native'
 import { Artwork } from '@/components/artwork'
@@ -43,21 +44,24 @@ function ContinueRow({ episode }: { episode: ContinueListeningEpisode }) {
   const player = usePlayer()
   const left = episode.durationSeconds ? episode.durationSeconds - episode.positionSeconds : null
 
+  function play() {
+    player.play({
+      id: episode.id,
+      title: episode.title,
+      podcastTitle: episode.podcast.title,
+      imageUrl: episode.imageUrl,
+      audioUrl: episode.audioUrl!,
+      durationSeconds: episode.durationSeconds,
+      positionSeconds: episode.positionSeconds,
+    })
+  }
+
   return (
     <Pressable
-      disabled={!episode.audioUrl}
-      onPress={() =>
-        player.play({
-          id: episode.id,
-          title: episode.title,
-          podcastTitle: episode.podcast.title,
-          imageUrl: episode.imageUrl,
-          audioUrl: episode.audioUrl!,
-          durationSeconds: episode.durationSeconds,
-          positionSeconds: episode.positionSeconds,
-        })
-      }
-      className="gap-2 border-b border-border px-4 py-3 active:bg-muted">
+      onPress={() => router.push({ pathname: '/episodes/[id]', params: { id: episode.id } })}
+      className="gap-2 border-b border-border px-4 py-3 active:bg-muted"
+      accessibilityRole="link"
+      accessibilityLabel={episode.title}>
       <View className="flex-row items-center gap-3">
         <Artwork uri={episode.imageUrl} size={56} />
         <View className="flex-1 gap-1">
@@ -69,9 +73,15 @@ function ContinueRow({ episode }: { episode: ContinueListeningEpisode }) {
             {left !== null ? ` · ${formatTime(left)} left` : ''}
           </Text>
         </View>
-        <View className="h-10 w-10 items-center justify-center rounded-full bg-primary">
-          <Icon as={Play} size={18} className="text-primary-foreground" />
-        </View>
+        {episode.audioUrl && (
+          <Pressable
+            onPress={play}
+            hitSlop={8}
+            className="h-10 w-10 items-center justify-center rounded-full bg-primary active:opacity-80"
+            accessibilityLabel={`Play ${episode.title}`}>
+            <Icon as={Play} size={18} className="text-primary-foreground" />
+          </Pressable>
+        )}
       </View>
       {episode.durationSeconds ? (
         <Progress value={(episode.positionSeconds / episode.durationSeconds) * 100} className="h-1" />

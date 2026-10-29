@@ -66,3 +66,30 @@ export type ContinueListeningEpisode = {
 export type SignInResult =
   | { status: 'signed-in'; token: string }
   | { status: 'two-factor'; challenge: string; methods: { totp: boolean; recovery: true } }
+
+export type CommentSegment = { text: string } | { mention: { slug: string; name: string | null } }
+
+// A GIF from KLIPY or GIPHY, shown from the provider as given.
+export type CommentGif = { provider: string; id: string; title: string; url: string; width: number; height: number }
+
+export type CommentReply = {
+  id: string
+  author: { name: string | null; slug: string; imageUrl: string | null }
+  body: CommentSegment[]
+  gif: CommentGif | null
+  atSeconds: number
+  createdAt: string
+  likeCount: number
+  liked: boolean
+  canDelete: boolean
+}
+
+export type EpisodeComment = CommentReply & { replies: CommentReply[] }
+
+export type EpisodePage = {
+  episode: Episode
+  podcast: { id: string; slug: string; title: string; imageUrl: string | null; isOwner: boolean }
+  comments: EpisodeComment[]
+  // Which GIF provider to search, with its public key; null if none is set up.
+  gifs: { provider: 'klipy' | 'giphy'; key: string } | null
+}

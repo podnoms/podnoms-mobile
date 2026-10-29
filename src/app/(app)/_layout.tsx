@@ -14,6 +14,7 @@ export default function AppLayout() {
     <Stack>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="podcasts/[slug]" options={{ title: '' }} />
+      <Stack.Screen name="episodes/[id]" options={{ title: '' }} />
       <Stack.Screen name="add-episode" options={{ title: 'Add episode', presentation: 'modal' }} />
       <Stack.Screen name="player" options={{ title: '', presentation: 'modal' }} />
     </Stack>

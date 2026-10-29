@@ -2,7 +2,8 @@
 
 The PodNoms app for Android and iOS: sign in, see your podcasts and how their
 episodes are coming along, add an episode from a link (or by sharing one to
-the app from YouTube, a browser, etc.), and listen, in the background, with
+the app from YouTube, a browser, etc.), read and write comments on episodes,
+and listen, in the background, with
 lock screen controls, picking up where you left off here or on the site.
 
 Built with Expo (SDK 58), Expo Router, NativeWind and
@@ -64,4 +65,12 @@ Signing in with a provider leaves that browser signed in to the site too.
 | `GET /api/mobile/podcasts`, `/podcasts/<slug>` | podcasts, and one with its episodes and live progress |
 | `POST /api/mobile/episodes`; `POST …/<id>/retry`; `DELETE …/<id>` | adding, retrying, deleting episodes |
 | `POST /api/mobile/episodes/<id>/position`, `GET /api/mobile/continue-listening` | where you left off |
+| `GET /api/mobile/episodes/<id>`; `POST …/<id>/comments` | an episode's page and its comments; commenting and replying |
+| `POST /api/mobile/comments/<id>/like`, `DELETE /api/mobile/comments/<id>` | liking and deleting comments |
 | `GET /api/episodes/<id>/audio` | audio (takes the token too) |
+
+## License
+
+[MIT](LICENSE) © 2026 Fergal Moran
+
+The license also retains the Expo copyright notice.

@@ -2,7 +2,8 @@ import { router } from 'expo-router'
 import { useShareIntentContext } from 'expo-share-intent'
 import { Check } from 'lucide-react-native'
 import { useEffect, useState } from 'react'
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from 'react-native'
+import { Pressable, View } from 'react-native'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 import { Artwork } from '@/components/artwork'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
@@ -49,8 +50,13 @@ export default function AddEpisodeScreen() {
   }
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} className="flex-1 bg-background">
-      <ScrollView contentContainerClassName="gap-5 p-4" keyboardShouldPersistTaps="handled">
+    // Scrolls whichever field is focused into view above the keyboard. It isn't
+    // a NativeWind component, so it's styled with style, not class names.
+    <View className="flex-1 bg-background">
+      <KeyboardAwareScrollView
+        bottomOffset={24}
+        contentContainerStyle={{ gap: 20, padding: 16 }}
+        keyboardShouldPersistTaps="handled">
         <View className="gap-1.5">
           <Label nativeID="link">Link</Label>
           <Input
@@ -96,7 +102,7 @@ export default function AddEpisodeScreen() {
         <Button onPress={submit} disabled={!selected || !url.trim() || add.isPending}>
           <Text>{add.isPending ? 'Adding…' : 'Add episode'}</Text>
         </Button>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
+    </View>
   )
 }

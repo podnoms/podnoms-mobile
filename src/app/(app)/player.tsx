@@ -1,6 +1,6 @@
 import { Host, Slider } from '@expo/ui'
 import { router } from 'expo-router'
-import { Pause, Play, RotateCcw, RotateCw } from 'lucide-react-native'
+import { MessageCircle, Pause, Play, RotateCcw, RotateCw } from 'lucide-react-native'
 import { useEffect } from 'react'
 import { Pressable, View } from 'react-native'
 import { Artwork } from '@/components/artwork'
@@ -59,12 +59,23 @@ export default function PlayerScreen() {
         </Pressable>
       </View>
 
-      <Pressable
-        onPress={() => setRate(nextRate)}
-        className="border border-border px-4 py-2 active:bg-muted"
-        accessibilityLabel={`Playback speed ${rate}x`}>
-        <Text className="font-semibold">{rate}×</Text>
-      </Pressable>
+      <View className="flex-row gap-3">
+        <Pressable
+          onPress={() => setRate(nextRate)}
+          className="border border-border px-4 py-2 active:bg-muted"
+          accessibilityLabel={`Playback speed ${rate}x`}>
+          <Text className="font-semibold">{rate}×</Text>
+        </Pressable>
+        <Pressable
+          onPress={() => {
+            router.back()
+            router.push({ pathname: '/episodes/[id]', params: { id: episode.id } })
+          }}
+          className="flex-row items-center gap-2 border border-border px-4 py-2 active:bg-muted">
+          <Icon as={MessageCircle} size={16} className="text-foreground" />
+          <Text className="font-semibold">Comments</Text>
+        </Pressable>
+      </View>
       {status.isBuffering && <Text variant="muted">Loading…</Text>}
     </View>
   )

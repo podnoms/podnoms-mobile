@@ -57,10 +57,14 @@ export function AppearanceProvider({ children }: { children: ReactNode }) {
     setColorScheme(Platform.OS === 'web' && preference === 'system' ? systemScheme : preference)
   }, [preference, systemScheme, setColorScheme])
 
+  // Admins can change the theme at any time, so it's asked for again whenever
+  // the app comes back to the front (see query-client.ts), and every minute
+  // while it's open. The server answers 304 while it hasn't changed.
   const site = useQuery({
     queryKey: ['theme', serverUrl],
     queryFn: () => api<SiteTheme>('/api/mobile/theme'),
-    staleTime: 5 * 60_000,
+    staleTime: 0,
+    refetchInterval: 60_000,
   })
   useEffect(() => {
     if (site.data !== undefined) void setItem(themeKey, JSON.stringify(site.data))

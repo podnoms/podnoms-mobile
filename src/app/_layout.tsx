@@ -1,38 +1,38 @@
 import '@/global.css'
 
 import { PortalHost } from '@rn-primitives/portal'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClientProvider } from '@tanstack/react-query'
 import { Stack, ThemeProvider } from 'expo-router'
 import { ShareIntentProvider } from 'expo-share-intent'
 import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 import { useEffect } from 'react'
 import { Platform } from 'react-native'
+import { KeyboardProvider } from 'react-native-keyboard-controller'
 import { AppearanceProvider, useAppearance } from '@/lib/appearance'
 import { AuthProvider, useAuth } from '@/lib/auth'
 import { PlayerProvider } from '@/lib/player'
+import { queryClient } from '@/lib/query-client'
 import { navTheme } from '@/lib/theme'
 
 void SplashScreen.preventAutoHideAsync()
-
-const queryClient = new QueryClient({
-  defaultOptions: { queries: { retry: 1, staleTime: 30_000 } },
-})
 
 export default function RootLayout() {
   return (
     // First, as expo-share-intent asks, so a share is caught before anything
     // else loads. Browsers can't share to the app.
     <ShareIntentProvider options={{ disabled: Platform.OS === 'web' }}>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <AppearanceProvider>
-            <PlayerProvider>
-              <Themed />
-            </PlayerProvider>
-          </AppearanceProvider>
-        </AuthProvider>
-      </QueryClientProvider>
+      <KeyboardProvider>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <AppearanceProvider>
+              <PlayerProvider>
+                <Themed />
+              </PlayerProvider>
+            </AppearanceProvider>
+          </AuthProvider>
+        </QueryClientProvider>
+      </KeyboardProvider>
     </ShareIntentProvider>
   )
 }
