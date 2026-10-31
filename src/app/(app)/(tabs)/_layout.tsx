@@ -1,5 +1,5 @@
 import { BottomTabBar, Tabs } from 'expo-router/js-tabs'
-import { Headphones, Podcast, Settings } from 'lucide-react-native'
+import { Headphones, House, Settings } from 'lucide-react-native'
 import { View } from 'react-native'
 import { MiniPlayer } from '@/components/mini-player'
 
@@ -14,7 +14,7 @@ export default function TabsLayout() {
       )}>
       <Tabs.Screen
         name="index"
-        options={{ title: 'Podcasts', tabBarIcon: ({ color, size }) => <Podcast color={color} size={size} /> }}
+        options={{ title: 'Home', tabBarIcon: ({ color, size }) => <House color={color} size={size} /> }}
       />
       <Tabs.Screen
         name="listen"

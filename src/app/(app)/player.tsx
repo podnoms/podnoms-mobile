@@ -30,7 +30,7 @@ export default function PlayerScreen() {
           {episode.title}
         </Text>
         <Text variant="muted" className="text-center">
-          {episode.podcastTitle}
+          {episode.showTitle}
         </Text>
       </View>
 

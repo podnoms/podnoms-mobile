@@ -2,35 +2,45 @@ import { Stack, useLocalSearchParams } from 'expo-router'
 import { FlatList, RefreshControl, View } from 'react-native'
 import { Artwork } from '@/components/artwork'
 import { EpisodeRow } from '@/components/episode-row'
+import { FollowButton } from '@/components/follow-button'
+import { LiveBadge } from '@/components/live-badge'
 import { MiniPlayer } from '@/components/mini-player'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Text } from '@/components/ui/text'
-import { usePodcast } from '@/hooks/use-podcasts'
+import { useShow } from '@/hooks/use-shows'
+import { pluralise } from '@/lib/format'
 
-export default function PodcastScreen() {
+export default function ShowScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>()
-  const query = usePodcast(slug)
-  const podcast = query.data?.podcast
+  const query = useShow(slug)
+  const show = query.data?.show
 
   return (
     <View className="flex-1 bg-background">
-      <Stack.Screen options={{ title: podcast?.title ?? '' }} />
+      <Stack.Screen options={{ title: show?.title ?? '' }} />
       <FlatList
-        data={podcast ? query.data!.episodes : []}
+        data={show ? query.data!.episodes : []}
         keyExtractor={(episode) => episode.id}
-        renderItem={({ item }) => <EpisodeRow episode={item} podcast={podcast!} />}
+        renderItem={({ item }) => <EpisodeRow episode={item} show={show!} />}
         refreshControl={<RefreshControl refreshing={query.isRefetching} onRefresh={() => void query.refetch()} />}
         ListHeaderComponent={
-          podcast ? (
+          show ? (
             <View className="flex-row gap-4 border-b border-border p-4">
-              <Artwork uri={podcast.imageUrl} size={96} />
+              <Artwork uri={show.imageUrl} size={96} />
               <View className="flex-1 gap-1">
-                <Text variant="h4">{podcast.title}</Text>
-                {podcast.description ? (
+                <Text variant="h4">{show.title}</Text>
+                <Text variant="muted" numberOfLines={1}>
+                  {[show.author, pluralise(show.followerCount, 'follower')].filter(Boolean).join(' · ')}
+                </Text>
+                <View className="flex-row">
+                  <LiveBadge show={show} />
+                </View>
+                {show.description ? (
                   <Text variant="muted" numberOfLines={4}>
-                    {podcast.description}
+                    {show.description}
                   </Text>
                 ) : null}
+                {!show.isOwner && <FollowButton show={show} />}
               </View>
             </View>
           ) : undefined

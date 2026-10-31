@@ -7,15 +7,16 @@ import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { Progress } from '@/components/ui/progress'
 import { Text } from '@/components/ui/text'
-import { useDeleteEpisode, useRetryEpisode } from '@/hooks/use-podcasts'
-import type { Episode, Podcast } from '@/lib/api-types'
+import { useDeleteEpisode, useRetryEpisode } from '@/hooks/use-shows'
+import type { Episode, Show } from '@/lib/api-types'
 import { describeProgress, formatDate, formatDuration } from '@/lib/format'
 import { usePlayer } from '@/lib/player'
 
-// One of the user's episodes: opens its page (with comments), plays it from
-// its button when it's ready, shows how it's coming along while it's being
-// made, and can be retried or deleted when that failed.
-export function EpisodeRow({ episode, podcast }: { episode: Episode; podcast: Podcast }) {
+// An episode in a show's list: opens its page (with comments) and plays it
+// from its button when it's ready. On the user's own shows, also shows how
+// it's coming along while it's being made, and can be retried or deleted when
+// that failed.
+export function EpisodeRow({ episode, show }: { episode: Episode; show: Show }) {
   const player = usePlayer()
   const retry = useRetryEpisode()
   const remove = useDeleteEpisode()
@@ -33,8 +34,8 @@ export function EpisodeRow({ episode, podcast }: { episode: Episode; podcast: Po
     player.play({
       id: episode.id,
       title: episode.title,
-      podcastTitle: podcast.title,
-      imageUrl: episode.imageUrl ?? podcast.imageUrl,
+      showTitle: show.title,
+      imageUrl: episode.imageUrl ?? show.imageUrl,
       audioUrl: episode.audioUrl!,
       durationSeconds: episode.durationSeconds,
       positionSeconds: episode.positionSeconds,
@@ -42,7 +43,7 @@ export function EpisodeRow({ episode, podcast }: { episode: Episode; podcast: Po
   }
 
   function confirmDelete() {
-    Alert.alert('Delete episode?', `"${episode.title}" will be removed from the podcast and its feed.`, [
+    Alert.alert('Delete episode?', `"${episode.title}" will be removed from the show and its feed.`, [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Delete', style: 'destructive', onPress: () => remove.mutate(episode.id) },
     ])
@@ -55,7 +56,7 @@ export function EpisodeRow({ episode, podcast }: { episode: Episode; podcast: Po
       accessibilityRole="link"
       accessibilityLabel={episode.title}>
       <View className="flex-row gap-3">
-        <Artwork uri={episode.imageUrl ?? podcast.imageUrl} size={56} />
+        <Artwork uri={episode.imageUrl ?? show.imageUrl} size={56} />
         <View className="flex-1 gap-1">
           <Text className="font-medium" numberOfLines={2}>
             {episode.title}

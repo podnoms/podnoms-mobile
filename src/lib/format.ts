@@ -24,11 +24,21 @@ export function formatDate(iso: string | null) {
   return new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
+// 1, "episode" → "1 episode"; 3, "episode" → "3 episodes".
+export function pluralise(count: number, noun: string) {
+  return `${count} ${noun}${count === 1 ? '' : 's'}`
+}
+
+// The time of day, as "14:05" or "2:05 PM" where the device's locale prefers it.
+export function formatClock(iso: string) {
+  return new Date(iso).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })
+}
+
 function formatBytes(bytes: number) {
   return bytes < 1024 * 1024 ? `${Math.round(bytes / 1024)} KB` : `${(bytes / 1024 / 1024).toFixed(1)} MB`
 }
 
-// What a processing episode is doing, as on the site's podcast page, with a
+// What a processing episode is doing, as on the site's show page, with a
 // fraction done when it's known.
 export function describeProgress(progress: EpisodeProgress | null): { label: string; fraction: number | null } {
   switch (progress?.stage) {

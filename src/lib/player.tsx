@@ -10,7 +10,7 @@ import { api, authHeaders } from '@/lib/api'
 export type PlayableEpisode = {
   id: string
   title: string
-  podcastTitle: string
+  showTitle: string
   imageUrl: string | null
   audioUrl: string
   durationSeconds: number | null
@@ -108,7 +108,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       player.play()
       player.setActiveForLockScreen(
         true,
-        { title: next.title, artist: next.podcastTitle, artworkUrl: next.imageUrl ?? undefined },
+        { title: next.title, artist: next.showTitle, artworkUrl: next.imageUrl ?? undefined },
         { showSeekBackward: true, showSeekForward: true },
       )
       setEpisode(next)

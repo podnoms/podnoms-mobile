@@ -42,7 +42,7 @@ export default function EpisodeScreen() {
     player.play({
       id: page.episode.id,
       title: page.episode.title,
-      podcastTitle: page.podcast.title,
+      showTitle: page.show.title,
       imageUrl: page.episode.imageUrl,
       audioUrl: page.episode.audioUrl,
       durationSeconds: page.episode.durationSeconds,
@@ -59,7 +59,7 @@ export default function EpisodeScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <Stack.Screen options={{ title: page?.podcast.title ?? '' }} />
+      <Stack.Screen options={{ title: page?.show.title ?? '' }} />
       <FlatList
         // Gives way to the composer as it grows (a GIF, the GIF picker).
         className="flex-1 bg-background"
@@ -139,7 +139,7 @@ function EpisodeHeader({
   onPlay: () => void
   commentCount: number
 }) {
-  const { episode, podcast } = page
+  const { episode, show } = page
   const [expanded, setExpanded] = useState(false)
   const working = episode.status === 'pending' || episode.status === 'processing'
   const progress = working ? describeProgress(episode.progress) : null
@@ -155,13 +155,9 @@ function EpisodeHeader({
         <Artwork uri={episode.imageUrl} size={112} />
         <View className="flex-1 gap-1">
           <Text variant="h4">{episode.title}</Text>
-          {podcast.isOwner ? (
-            <Link href={{ pathname: '/podcasts/[slug]', params: { slug: podcast.slug } }}>
-              <Text className="text-primary">{podcast.title}</Text>
-            </Link>
-          ) : (
-            <Text variant="muted">{podcast.title}</Text>
-          )}
+          <Link href={{ pathname: '/shows/[slug]', params: { slug: show.slug } }}>
+            <Text className="text-primary">{show.title}</Text>
+          </Link>
           <Text variant="muted">{meta.join(' · ')}</Text>
           <StatusBadge status={episode.status} isPrivate={episode.private} />
         </View>

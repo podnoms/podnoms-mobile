@@ -1,7 +1,8 @@
 # PodNoms mobile
 
-The PodNoms app for Android and iOS: sign in, see your podcasts and how their
-episodes are coming along, add an episode from a link (or by sharing one to
+The PodNoms app for Android and iOS, mainly for listening: sign in, follow
+shows and find trending ones, watch broadcasts, see your own shows and how
+their episodes are coming along, add an episode from a link (or by sharing one to
 the app from YouTube, a browser, etc.), read and write comments on episodes,
 and listen, in the background, with
 lock screen controls, picking up where you left off here or on the site.
@@ -57,16 +58,22 @@ app's `/sign-in` page instead; the platform allows that only on `localhost`.
 Signing in with a provider leaves that browser signed in to the site too.
 
 | | |
-|---|---|
+| --- | --- |
 | `POST /api/mobile/auth/sign-in`, `/two-factor`, `/sign-out` | tokens |
 | `GET /api/mobile/theme` | the site's theme colours, as HSL |
 | `GET /api/mobile/auth/providers`; `GET …/oauth/<provider>` → `…/oauth/finish`; `POST …/oauth/exchange` | signing in with a provider |
 | `GET /api/mobile/me` | the signed-in user |
-| `GET /api/mobile/podcasts`, `/podcasts/<slug>` | podcasts, and one with its episodes and live progress |
+| `GET /api/mobile/home` | the home page: shows followed, trending and the user's own |
+| `GET /api/mobile/shows`, `/shows/<slug>` | the user's shows; any show they may see with its episodes (with live progress on their own) |
+| `POST /api/mobile/follows` | following and unfollowing a show |
 | `POST /api/mobile/episodes`; `POST …/<id>/retry`; `DELETE …/<id>` | adding, retrying, deleting episodes |
 | `POST /api/mobile/episodes/<id>/position`, `GET /api/mobile/continue-listening` | where you left off |
 | `GET /api/mobile/episodes/<id>`; `POST …/<id>/comments` | an episode's page and its comments; commenting and replying |
 | `POST /api/mobile/comments/<id>/like`, `DELETE /api/mobile/comments/<id>` | liking and deleting comments |
+| `GET /api/mobile/live/<slug>`; `GET …/<slug>/hls/<file>` | a show's live page (what's on, chat, viewers), polled every few seconds; its video as HLS, by token |
+| `GET /api/mobile/live` | the slugs of shows live now, polled for the badges |
+| `GET`, `POST /api/mobile/notifications`; `POST …/shows`; `POST …/device` | notification settings; muting a followed show; this device's push token |
+| `POST /api/mobile/broadcasts/<id>/chat`, `DELETE /api/mobile/chat/<id>` | writing and deleting live chat |
 | `GET /api/episodes/<id>/audio` | audio (takes the token too) |
 
 ## License
@@ -74,3 +81,20 @@ Signing in with a provider leaves that browser signed in to the site too.
 [MIT](LICENSE) © 2026 Fergal Moran
 
 The license also retains the Expo copyright notice.
+
+## Push notifications
+
+Followers hear about shows going live and new episodes through Expo's push
+service. Builds need an EAS project and credentials, once:
+
+1. `bunx eas-cli init`, which adds the project id to `app.json`.
+2. Android: make a Firebase project with an Android app for `com.podnoms.mobile`,
+   put its `google-services.json` in the project root, set
+   `"googleServicesFile": "./google-services.json"` under `expo.android` in
+   `app.json`, and upload a service account key for FCM V1 with
+   `bunx eas-cli credentials`.
+3. iOS: `bunx eas-cli credentials` sets up the APNs key.
+4. Rebuild the app.
+
+Until then the settings work, but the Notifications screen says this build
+can't receive them.

@@ -5,7 +5,7 @@ import { Artwork } from '@/components/artwork'
 import { Icon } from '@/components/ui/icon'
 import { Progress } from '@/components/ui/progress'
 import { Text } from '@/components/ui/text'
-import { useContinueListening } from '@/hooks/use-podcasts'
+import { useContinueListening } from '@/hooks/use-shows'
 import type { ContinueListeningEpisode } from '@/lib/api-types'
 import { formatTime } from '@/lib/format'
 import { usePlayer } from '@/lib/player'
@@ -48,7 +48,7 @@ function ContinueRow({ episode }: { episode: ContinueListeningEpisode }) {
     player.play({
       id: episode.id,
       title: episode.title,
-      podcastTitle: episode.podcast.title,
+      showTitle: episode.show.title,
       imageUrl: episode.imageUrl,
       audioUrl: episode.audioUrl!,
       durationSeconds: episode.durationSeconds,
@@ -69,7 +69,7 @@ function ContinueRow({ episode }: { episode: ContinueListeningEpisode }) {
             {episode.title}
           </Text>
           <Text variant="muted" numberOfLines={1}>
-            {episode.podcast.title}
+            {episode.show.title}
             {left !== null ? ` · ${formatTime(left)} left` : ''}
           </Text>
         </View>

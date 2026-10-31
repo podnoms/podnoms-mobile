@@ -4,7 +4,7 @@ import { View } from 'react-native'
 import { Icon } from '@/components/ui/icon'
 import { cn } from '@/lib/utils'
 
-// Podcast or episode artwork, square, with an icon when there's none.
+// Show or episode artwork, square, with an icon when there's none.
 export function Artwork({ uri, size, className }: { uri: string | null; size: number; className?: string }) {
   return (
     <View

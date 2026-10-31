@@ -27,7 +27,7 @@ export function MiniPlayer() {
             {episode.title}
           </Text>
           <Text variant="muted" numberOfLines={1}>
-            {episode.podcastTitle}
+            {episode.showTitle}
           </Text>
         </View>
         <Pressable
