@@ -4,6 +4,7 @@ import { Pressable, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ProviderIcon, type ProviderId } from '@/components/provider-icon'
+import { SignInBackdrop, SignInHero } from '@/components/sign-in-hero'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -85,23 +86,21 @@ export default function SignInScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
+      <SignInBackdrop />
       {/* Scrolls whichever field is focused into view above the keyboard. */}
       <KeyboardAwareScrollView
         bottomOffset={24}
         contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', gap: 24, padding: 24 }}
         keyboardShouldPersistTaps="handled">
-          <View className="gap-2">
-            <Text variant="h1" className="text-left">
-              Sign in
-            </Text>
-            <Text variant="muted">
-              {step.kind === 'password'
+          <SignInHero
+            subtitle={
+              step.kind === 'password'
                 ? 'Sign in the same way you do on the site.'
                 : step.method === 'totp'
                   ? 'Enter the code from your authenticator app.'
-                  : 'Enter one of your recovery codes.'}
-            </Text>
-          </View>
+                  : 'Enter one of your recovery codes.'
+            }
+          />
 
           {step.kind === 'password' ? (
             <View className="gap-4">
