@@ -13,9 +13,15 @@ export class ApiError extends Error {
   }
 }
 
-export const defaultServerUrl = __DEV__ ?
+export const builtInServerUrl = __DEV__ ?
   'https://podnoms.dev.fergl.ie:3000' :
   'https://podnoms.com'
+
+// A script can pick the server instead (`bun run dev:production`); AuthProvider
+// switches to it, and signs out, when it differs from the last launch's.
+export const serverOverride = process.env.EXPO_PUBLIC_SERVER_URL
+
+export const defaultServerUrl = serverOverride ?? builtInServerUrl
 
 // Says who's asking, as the server takes React Native's default on Android
 // (okhttp) for a bot and doesn't count its plays. Browsers set their own.
@@ -35,6 +41,10 @@ export function configureApi(values: Partial<typeof config>) {
 // Headers that let the server know who's asking, for audio requests too.
 export function authHeaders(): Record<string, string> {
   return config.token ? { Authorization: `Bearer ${config.token}` } : {}
+}
+
+export function isSignedIn() {
+  return config.token !== null
 }
 
 export function serverUrl() {

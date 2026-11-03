@@ -31,7 +31,11 @@ Run `bunx tsc --noEmit` and `bun run lint` before calling anything done.
 
 ### Pointing it at a local server
 
-The server defaults to `https://podnoms.com`; change it on the sign-in screen
+Release builds default to `https://podnoms.com` and debug builds to
+`https://podnoms.dev.fergl.ie:3000`. `bun run dev` and `bun run dev:production`
+run the debug build against the dev or production server: starting with a
+different one from last time switches to it and signs out, as the token belongs
+to the other server. Within a run, change it on the sign-in screen
 ("Server: … · Change"). For a platform running with `bun run _dev`, use your
 machine's LAN address, e.g. `http://192.168.1.20:5173`. `localhost` is the
 phone itself. Android only allows plain `http` in debug builds.
@@ -98,3 +102,36 @@ service. Builds need an EAS project and credentials, once:
 
 Until then the settings work, but the Notifications screen says this build
 can't receive them.
+
+## Android Auto
+
+In the car, PodNoms lists **Continue listening** and **Following** (the shows
+you follow, then each show's latest episodes); picking one plays it with the
+app's player. While anything plays, the car shows its controls, and playback
+pauses when the car disconnects, as with other media apps. This works with the
+app closed too: the car starts its JS without a screen.
+
+The car side is a local module, `modules/podnoms-auto` (Android only). Its
+`AutoLibraryService` is what Auto connects to: one media session for as long
+as the service runs, playing through expo-audio's player once the app has
+played something. It sends what the car asks for to `src/lib/auto.ts`, which
+fetches it from the API and plays episodes with `src/lib/player-engine.ts`.
+The module compiles against expo-audio, which Expo normally links prebuilt, so
+`package.json` sets `expo.autolinking.android.buildFromSource` for it.
+
+To try it without a car, use Google's Desktop Head Unit (installed with the
+SDK manager) against a phone; Play won't install Android Auto on emulators. A
+debug build (`bunx expo run:android --device`) works as well as a release one.
+
+1. Once: in Android Auto's settings on the phone, tap the version until
+   developer mode is on, then in its developer settings turn on **Unknown
+   sources** (Auto hides apps not installed from Play otherwise). Pair the
+   phone for wireless debugging (Android Studio's QR code).
+2. Each time: turn on Wireless debugging, and in Android Auto choose ⋮ →
+   **Start head unit server**.
+3. `bun run auto` finds the phone (connecting to it if adb hasn't), forwards
+   the port and opens the head unit. Pass a serial to use another device.
+4. Play an episode in the app; closing the head unit should pause it.
+bunx expo run:android --device Pixel_7_Pro_API_34   # dev build; afterwards just `bun run dev`
+adb -s emulator-5554 forward tcp:5277 tcp:5277
+/opt/android/sdk/extras/google/auto/desktop-head-unit

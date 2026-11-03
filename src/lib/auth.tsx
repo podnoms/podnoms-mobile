@@ -4,13 +4,15 @@
 import { useQueryClient } from '@tanstack/react-query'
 import * as Device from 'expo-device'
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
-import { api, configureApi, defaultServerUrl } from '@/lib/api'
+import { api, builtInServerUrl, configureApi, defaultServerUrl, serverOverride } from '@/lib/api'
 import type { SignInResult } from '@/lib/api-types'
 import { authorizeWithProvider } from '@/lib/oauth'
 import { deleteItem, getItem, setItem } from '@/lib/storage'
 
 const tokenKey = 'podnoms.token'
 const serverKey = 'podnoms.server'
+// The server a script last picked, so a different one is only switched to once.
+const serverOverrideKey = 'podnoms.server-override'
 
 type AuthState = { status: 'loading' } | { status: 'signed-out' } | { status: 'signed-in'; token: string }
 
@@ -35,6 +37,31 @@ export function normaliseServerUrl(input: string) {
   return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`
 }
 
+let session: Promise<{ token: string | null; serverUrl: string }> | null = null
+
+// Points the API at the token and server kept from last time, once per launch,
+// for AuthProvider and for Android Auto when it starts the app headless
+// (auto.ts).
+export function loadSession() {
+  session ??= (async () => {
+    let [token, server] = await Promise.all([getItem(tokenKey), getItem(serverKey)])
+    if (serverOverride && serverOverride !== (await getItem(serverOverrideKey))) {
+      await setItem(serverOverrideKey, serverOverride)
+      // The token belongs to the server the app was on, so a new one signs out.
+      if ((server ?? builtInServerUrl) !== serverOverride) {
+        await deleteItem(tokenKey)
+        token = null
+      }
+      await setItem(serverKey, serverOverride)
+      server = serverOverride
+    }
+    const serverUrl = server ?? defaultServerUrl
+    configureApi({ serverUrl, token })
+    return { token, serverUrl }
+  })()
+  return session
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient()
   const [state, setState] = useState<AuthState>({ status: 'loading' })
@@ -55,9 +82,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     void (async () => {
-      const [token, server] = await Promise.all([getItem(tokenKey), getItem(serverKey)])
-      const url = server ?? defaultServerUrl
-      configureApi({ serverUrl: url, token, onUnauthorized: () => void forget() })
+      const { token, serverUrl: url } = await loadSession()
+      configureApi({ onUnauthorized: () => void forget() })
       setServerUrlState(url)
       setState(token ? { status: 'signed-in', token } : { status: 'signed-out' })
     })()

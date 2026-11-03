@@ -1,0 +1,26 @@
+plugins {
+  id 'com.android.library'
+  id 'expo-module-gradle-plugin'
+}
+
+group = 'com.podnoms'
+version = '1.0.0'
+
+android {
+  namespace "expo.modules.podnomsauto"
+  defaultConfig {
+    versionCode 1
+    versionName '1.0.0'
+  }
+}
+
+dependencies {
+  // AudioPlayer, whose ExoPlayer the car's session controls; needs expo-audio
+  // built from source (expo.autolinking.android.buildFromSource in package.json).
+  implementation project(':expo-audio')
+  implementation 'com.facebook.react:react-android'
+  // Must match expo-audio's.
+  def media3Version = '1.9.1'
+  implementation "androidx.media3:media3-session:$media3Version"
+  implementation "androidx.media3:media3-exoplayer:$media3Version"
+}
