@@ -4,6 +4,7 @@ import { Check } from 'lucide-react-native'
 import { useEffect, useState } from 'react'
 import { Pressable, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Artwork } from '@/components/artwork'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
@@ -23,6 +24,7 @@ export default function AddEpisodeScreen() {
   const { hasShareIntent, shareIntent, resetShareIntent } = useShareIntentContext()
   const shows = useShows()
   const add = useAddEpisode()
+  const { bottom } = useSafeAreaInsets()
   // A shared link opens this screen (see (app)/_layout.tsx) with the share
   // still to hand.
   const [url, setUrl] = useState(() => (hasShareIntent ? (shareIntent.webUrl ?? linkIn(shareIntent.text)) : ''))
@@ -43,7 +45,7 @@ export default function AddEpisodeScreen() {
       {
         onSuccess: () => {
           router.back()
-          if (selectedShow) router.push({ pathname: '/shows/[slug]', params: { slug: selectedShow.slug } })
+          if (selectedShow) router.push({ pathname: '/shows/[id]', params: { id: selectedShow.id } })
         },
       },
     )
@@ -55,7 +57,8 @@ export default function AddEpisodeScreen() {
     <View className="flex-1 bg-background">
       <KeyboardAwareScrollView
         bottomOffset={24}
-        contentContainerStyle={{ gap: 20, padding: 16 }}
+        // Its end clears the system's navigation bar (the app draws edge to edge).
+        contentContainerStyle={{ gap: 20, padding: 16, paddingBottom: 16 + bottom }}
         keyboardShouldPersistTaps="handled">
         <View className="gap-1.5">
           <Label nativeID="link">Link</Label>

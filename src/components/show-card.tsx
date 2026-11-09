@@ -15,7 +15,7 @@ export function ShowCard({ show }: { show: Show | ShowSummary }) {
     'episodeCount' in show ? [show.author, pluralise(show.episodeCount, 'episode')].filter(Boolean).join(' · ') : null
   return (
     <Pressable
-      onPress={() => router.push({ pathname: '/shows/[slug]', params: { slug: show.slug } })}
+      onPress={() => router.push({ pathname: '/shows/[id]', params: { id: show.id } })}
       accessibilityRole="link"
       className="flex-row items-center gap-3 border-b border-border px-4 py-3 active:bg-muted">
       <Artwork uri={show.imageUrl} size={64} />

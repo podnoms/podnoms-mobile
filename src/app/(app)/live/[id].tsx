@@ -19,8 +19,8 @@ import { usePlayer } from '@/lib/player'
 // A show's live page: its broadcast while there is one, and the chat. It
 // follows the broadcast starting and ending, as on the site.
 export default function LiveScreen() {
-  const { slug } = useLocalSearchParams<{ slug: string }>()
-  const query = useLivePage(slug)
+  const { id: showId } = useLocalSearchParams<{ id: string }>()
+  const query = useLivePage(showId)
   const player = usePlayer()
   const page = query.data
   const broadcastId = page?.broadcast?.id ?? null
@@ -58,7 +58,7 @@ export default function LiveScreen() {
       <Stack.Screen options={{ title: page.show.title }} />
       <Stage page={page} />
       {!keyboardOpen && !panelOpen && <Details page={page} />}
-      <LiveChat slug={slug} broadcastId={broadcastId} messages={page.chat} gifs={page.gifs} onPanelChange={setPanelOpen} />
+      <LiveChat showId={showId} broadcastId={broadcastId} messages={page.chat} gifs={page.gifs} onPanelChange={setPanelOpen} />
       {/* Keeps the message box just above the keyboard. */}
       <KeyboardSpacer />
     </View>

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api'
-import type { CommentGif, EpisodeComment, EpisodePage } from '@/lib/api-types'
+import type { CommentGif, EpisodeComment, EpisodePage, Waveform } from '@/lib/api-types'
 
 export function useEpisodePage(id: string) {
   return useQuery({
@@ -10,6 +10,18 @@ export function useEpisodePage(id: string) {
       const status = query.state.data?.episode.status
       return status === 'pending' || status === 'processing' ? 5_000 : false
     },
+  })
+}
+
+// The playing episode's waveform, one query shared by the player and the mini
+// player. It's made once, just after processing, so it's kept once there; until
+// then, it's looked for again now and then.
+export function useWaveform(episodeId: string | undefined) {
+  return useQuery({
+    queryKey: ['waveform', episodeId],
+    queryFn: () => api<Waveform | null>(`/api/mobile/episodes/${encodeURIComponent(episodeId!)}/waveform`),
+    enabled: !!episodeId,
+    staleTime: (query) => (query.state.data ? Infinity : 60_000),
   })
 }
 

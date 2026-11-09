@@ -19,7 +19,7 @@
       },
       "googleServicesFile": "google-services.json",
       "predictiveBackGestureEnabled": false,
-      "package": "com.podnoms.mobile",
+      "package": "com.podnoms.android",
       "permissions": [
         "android.permission.MODIFY_AUDIO_SETTINGS",
         "android.permission.FOREGROUND_SERVICE",

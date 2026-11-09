@@ -15,12 +15,12 @@ export function LiveIndicator() {
 }
 
 // The same on a show that's live right now, opening its live page when pressed.
-export function LiveBadge({ show }: { show: { slug: string; live: boolean } }) {
+export function LiveBadge({ show }: { show: { id: string; live: boolean } }) {
   const live = useIsLive(show)
   if (!live) return null
   return (
     <Pressable
-      onPress={() => router.push({ pathname: '/live/[slug]', params: { slug: show.slug } })}
+      onPress={() => router.push({ pathname: '/live/[id]', params: { id: show.id } })}
       hitSlop={8}
       accessibilityRole="link"
       accessibilityLabel="Live now. Watch live"

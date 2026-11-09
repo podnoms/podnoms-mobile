@@ -15,12 +15,11 @@ export default function AppLayout() {
   return (
     <Stack>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="shows/[slug]" options={{ title: '' }} />
+      <Stack.Screen name="shows/[id]" options={{ title: '' }} />
       <Stack.Screen name="episodes/[id]" options={{ title: '' }} />
-      <Stack.Screen name="live/[slug]" options={{ title: '' }} />
+      <Stack.Screen name="live/[id]" options={{ title: '' }} />
       <Stack.Screen name="notifications" options={{ title: 'Notifications' }} />
       <Stack.Screen name="add-episode" options={{ title: 'Add episode', presentation: 'modal' }} />
-      <Stack.Screen name="player" options={{ title: '', presentation: 'modal' }} />
     </Stack>
   )
 }

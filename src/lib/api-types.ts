@@ -113,6 +113,10 @@ export type EpisodePage = {
   gifs: { provider: 'klipy' | 'giphy'; key: string } | null
 }
 
+// /api/mobile/episodes/<id>/waveform: the episode's loudness across its length,
+// one bar height from 0 to 255 each; null until it's been made.
+export type Waveform = number[]
+
 export type ChatMessage = {
   id: string
   author: { name: string | null; imageUrl: string | null }

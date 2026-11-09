@@ -11,8 +11,7 @@ import {
   type NativeSyntheticEvent,
   type TextInputSelectionChangeEvent,
 } from 'react-native'
-import { EmojiPicker } from '@/components/emoji-picker'
-import { GifPicker } from '@/components/gif-picker'
+import { ExpressionPicker } from '@/components/expression-picker'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
@@ -22,7 +21,7 @@ import { useDeleteChat, useSendChat } from '@/hooks/use-live'
 import { ApiError } from '@/lib/api'
 import type { ChatMessage } from '@/lib/api-types'
 import { formatClock } from '@/lib/format'
-import { commentGif, type GifConfig } from '@/lib/gifs'
+import { commentGif, findGifLink, gifFromLink, type GifConfig } from '@/lib/gifs'
 import { cn } from '@/lib/utils'
 
 // The longest message the platform takes (chatMessageMaxLength there).
@@ -33,7 +32,7 @@ const maxLength = 500
 const followSlack = 48
 
 type Props = {
-  slug: string
+  showId: string
   // Null while not live: the chat so far stays, but no one can write.
   broadcastId: string | null
   messages: ChatMessage[]
@@ -45,19 +44,19 @@ type Props = {
 
 // A broadcast's chat, as on the site: messages as they come, and a box to
 // write one with emoji and GIFs while it's live.
-export function LiveChat({ slug, broadcastId, messages, gifs, onPanelChange }: Props) {
-  const send = useSendChat(slug)
+export function LiveChat({ showId, broadcastId, messages, gifs, onPanelChange }: Props) {
+  const send = useSendChat(showId)
   const [body, setBody] = useState('')
-  // The pickers take the keyboard's place while they're open.
-  const [panel, setPanelState] = useState<'emoji' | 'gif' | null>(null)
+  // The emoji and GIF picker takes the keyboard's place while it's open.
+  const [panelOpen, setPanelState] = useState(false)
   const list = useRef<FlatList<ChatMessage>>(null)
   const following = useRef(true)
   // Where the cursor is, for an emoji to go in there.
   const selection = useRef({ start: 0, end: 0 })
 
-  function setPanel(next: 'emoji' | 'gif' | null) {
-    setPanelState(next)
-    onPanelChange(next !== null)
+  function setPanel(open: boolean) {
+    setPanelState(open)
+    onPanelChange(open)
   }
 
   // A frame later, as the list goes by the rows it has measured.
@@ -69,9 +68,9 @@ export function LiveChat({ slug, broadcastId, messages, gifs, onPanelChange }: P
     following.current = contentSize.height - contentOffset.y - layoutMeasurement.height < followSlack
   }
 
-  function togglePanel(next: 'emoji' | 'gif') {
-    if (panel !== next) Keyboard.dismiss()
-    setPanel(panel === next ? null : next)
+  function togglePanel() {
+    if (!panelOpen) Keyboard.dismiss()
+    setPanel(!panelOpen)
   }
 
   function insertEmoji(emoji: string) {
@@ -83,10 +82,15 @@ export function LiveChat({ slug, broadcastId, messages, gifs, onPanelChange }: P
     send.reset()
   }
 
-  function submit() {
+  async function submit() {
     if (!broadcastId || !body.trim() || send.isPending) return
     following.current = true
-    send.mutate({ broadcastId, body: body.trim() }, { onSuccess: () => setBody('') })
+    // A keyboard's GIF arrives as its link (see findGifLink): it's sent as a
+    // GIF, with any other text; as typed if it can't be loaded.
+    const link = findGifLink(body)
+    const gif = link ? await gifFromLink(link).then(commentGif, () => null) : null
+    const text = gif ? link!.rest : body.trim()
+    send.mutate({ broadcastId, body: text || undefined, gif: gif ?? undefined }, { onSuccess: () => setBody('') })
   }
 
   const error = send.error && (send.error instanceof ApiError && send.error.status < 500 ? send.error.message : "Your message wasn't sent. Try again.")
@@ -105,7 +109,7 @@ export function LiveChat({ slug, broadcastId, messages, gifs, onPanelChange }: P
         onMomentumScrollEnd={updateFollowing}
         onContentSizeChange={followNewest}
         onLayout={followNewest}
-        renderItem={({ item }) => <Message message={item} slug={slug} />}
+        renderItem={({ item }) => <Message message={item} showId={showId} />}
         ListEmptyComponent={
           <Text variant="muted" className="py-4 text-center">
             {broadcastId ? 'No messages yet. Say hello!' : 'The chat opens when the broadcast starts.'}
@@ -123,7 +127,7 @@ export function LiveChat({ slug, broadcastId, messages, gifs, onPanelChange }: P
             onSelectionChange={({ nativeEvent }: TextInputSelectionChangeEvent) => {
               selection.current = nativeEvent.selection
             }}
-            onFocus={() => setPanel(null)}
+            onFocus={() => setPanel(false)}
             onSubmitEditing={submit}
             submitBehavior="submit"
             returnKeyType="send"
@@ -133,33 +137,24 @@ export function LiveChat({ slug, broadcastId, messages, gifs, onPanelChange }: P
             className="h-10 flex-1"
           />
           <PanelButton
-            open={panel === 'emoji'}
+            open={panelOpen}
             disabled={!broadcastId}
-            onPress={() => togglePanel('emoji')}
-            label={panel === 'emoji' ? 'Close emoji' : 'Add an emoji'}>
-            <Icon as={Smile} size={20} className={panel === 'emoji' ? 'text-primary-foreground' : 'text-foreground'} />
+            onPress={togglePanel}
+            label={panelOpen ? 'Close emoji and GIFs' : gifs ? 'Add an emoji or GIF' : 'Add an emoji'}>
+            <Icon as={Smile} size={20} className={panelOpen ? 'text-primary-foreground' : 'text-foreground'} />
           </PanelButton>
-          {gifs && (
-            <PanelButton
-              open={panel === 'gif'}
-              disabled={!broadcastId}
-              onPress={() => togglePanel('gif')}
-              label={panel === 'gif' ? 'Close GIFs' : 'Add a GIF'}>
-              <Text className={cn('text-xs font-bold', panel === 'gif' ? 'text-primary-foreground' : 'text-foreground')}>GIF</Text>
-            </PanelButton>
-          )}
           <Button size="icon" onPress={submit} disabled={!broadcastId || !body.trim() || send.isPending} accessibilityLabel="Send">
             <Icon as={Send} />
           </Button>
         </View>
         {error && <Text className="text-sm text-destructive">{error}</Text>}
-        {panel === 'emoji' && <EmojiPicker onPick={insertEmoji} />}
-        {panel === 'gif' && gifs && (
-          <GifPicker
-            config={gifs}
-            onPick={(picked) => {
+        {panelOpen && (
+          <ExpressionPicker
+            gifs={gifs}
+            onEmoji={insertEmoji}
+            onGif={(picked) => {
               if (!broadcastId) return
-              setPanel(null)
+              setPanel(false)
               following.current = true
               send.mutate({ broadcastId, gif: commentGif(picked) })
             }}
@@ -195,8 +190,8 @@ function PanelButton({
   )
 }
 
-function Message({ message, slug }: { message: ChatMessage; slug: string }) {
-  const remove = useDeleteChat(slug)
+function Message({ message, showId }: { message: ChatMessage; showId: string }) {
+  const remove = useDeleteChat(showId)
   const name = message.author.name ?? 'A listener'
 
   function confirmDelete() {

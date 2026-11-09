@@ -9,7 +9,7 @@ import { enableNotifications } from '@/lib/notifications'
 
 // Follows or unfollows a show, which puts it on the home page or takes it off.
 export function FollowButton({ show }: { show: ShowDetails }) {
-  const follow = useFollowShow(show.slug)
+  const follow = useFollowShow(show.id)
   return (
     <View className="flex-row pt-1">
       <Button

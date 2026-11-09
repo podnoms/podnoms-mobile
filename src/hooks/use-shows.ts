@@ -19,10 +19,10 @@ export function useHome() {
   return useQuery({ queryKey: ['home'], queryFn: () => api<Home>('/api/mobile/home') })
 }
 
-export function useShow(slug: string) {
+export function useShow(id: string) {
   return useQuery({
-    queryKey: ['show', slug],
-    queryFn: () => api<ShowWithEpisodes>(`/api/mobile/shows/${encodeURIComponent(slug)}?limit=100`),
+    queryKey: ['show', id],
+    queryFn: () => api<ShowWithEpisodes>(`/api/mobile/shows/${encodeURIComponent(id)}?limit=100`),
     refetchInterval: (query) =>
       query.state.data?.episodes.some((episode) => episode.status === 'pending' || episode.status === 'processing')
         ? processingRefetchMs
@@ -33,23 +33,23 @@ export function useShow(slug: string) {
 // Whether a show is live now, from a small list every badge shares, so one
 // shows up within seconds wherever it's looking. Until that's loaded, what the
 // show's own page or list said.
-export function useIsLive(show: { slug: string; live: boolean }) {
+export function useIsLive(show: { id: string; live: boolean }) {
   const liveNow = useQuery({
     queryKey: ['live-now'],
-    queryFn: () => api<{ slugs: string[] }>('/api/mobile/live'),
+    queryFn: () => api<{ showIds: string[] }>('/api/mobile/live'),
     refetchInterval: liveRefetchMs,
     staleTime: 0,
   })
-  return liveNow.data ? liveNow.data.slugs.includes(show.slug) : show.live
+  return liveNow.data?.showIds ? liveNow.data.showIds.includes(show.id) : show.live
 }
 
-export function useFollowShow(slug: string) {
+export function useFollowShow(showId: string) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (input: { showId: string; following: boolean }) =>
       api<{ following: boolean; followerCount: number }>('/api/mobile/follows', { method: 'POST', body: input }),
     onSuccess: (result) => {
-      queryClient.setQueryData<ShowWithEpisodes>(['show', slug], (page) =>
+      queryClient.setQueryData<ShowWithEpisodes>(['show', showId], (page) =>
         page ? { ...page, show: { ...page.show, ...result } } : page,
       )
       return queryClient.invalidateQueries({ queryKey: ['home'] })

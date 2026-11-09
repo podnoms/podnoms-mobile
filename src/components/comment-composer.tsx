@@ -1,16 +1,15 @@
 import { Image } from 'expo-image'
-import { X } from 'lucide-react-native'
-import { useState } from 'react'
-import { Keyboard, Pressable, View } from 'react-native'
-import { GifPicker } from '@/components/gif-picker'
-import { Button } from '@/components/ui/button'
+import { SendHorizontal, Smile, X } from 'lucide-react-native'
+import { useRef, useState } from 'react'
+import { Keyboard, Platform, Pressable, View, type TextInputSelectionChangeEvent } from 'react-native'
+import { ExpressionPicker } from '@/components/expression-picker'
 import { Icon } from '@/components/ui/icon'
 import { Text } from '@/components/ui/text'
 import { Textarea } from '@/components/ui/textarea'
 import { useAddComment } from '@/hooks/use-episode'
 import type { CommentReply } from '@/lib/api-types'
 import { formatTime } from '@/lib/format'
-import { commentGif, type GifConfig, type GifResult } from '@/lib/gifs'
+import { commentGif, findGifLink, gifFromLink, type GifConfig, type GifResult } from '@/lib/gifs'
 import { cn } from '@/lib/utils'
 
 // The longest comment the platform takes (commentMaxLength there).
@@ -32,12 +31,33 @@ export function CommentComposer({ episodeId, atSeconds, replyingTo, onCancelRepl
   const add = useAddComment(episodeId)
   const [body, setBody] = useState('')
   const [gif, setGif] = useState<GifResult | null>(null)
-  // The GIF picker takes the keyboard's place while it's open.
+  // The emoji and GIF picker takes the keyboard's place while it's open.
   const [picking, setPicking] = useState(false)
+  // Where the cursor is, for an emoji to go in there.
+  const selection = useRef({ start: 0, end: 0 })
 
   function togglePicker() {
     if (!picking) Keyboard.dismiss()
     setPicking(!picking)
+  }
+
+  // A keyboard's GIF arrives as its link (see findGifLink): it becomes the
+  // comment's GIF, unless there's one already, and goes back in the text if
+  // it can't be loaded.
+  function changeText(text: string) {
+    const link = gif ? null : findGifLink(text)
+    if (!link) return setBody(text)
+    setBody(link.rest)
+    gifFromLink(link).then(setGif, () => setBody((current) => (current ? `${current} ${link.url}` : link.url)))
+  }
+
+  // Emoji go in at the cursor, and the picker stays open for more.
+  function insertEmoji(emoji: string) {
+    const { start, end } = selection.current
+    const text = body.slice(0, start) + emoji + body.slice(end)
+    if (text.length > maxLength) return
+    setBody(text)
+    selection.current = { start: start + emoji.length, end: start + emoji.length }
   }
 
   function post() {
@@ -54,17 +74,19 @@ export function CommentComposer({ episodeId, atSeconds, replyingTo, onCancelRepl
     )
   }
 
+  const canPost = (!!body.trim() || !!gif) && !add.isPending
+
   return (
-    <View className="gap-2 border-t border-border bg-background px-4 pb-3 pt-2">
-      {replyingTo ? (
-        <View className="flex-row items-center justify-between">
-          <Text variant="muted">Replying to {replyingTo.author.name ?? `@${replyingTo.author.slug}`}</Text>
+    <View className="gap-2 border-t border-border bg-card px-3 py-2">
+      {replyingTo && (
+        <View className="flex-row items-center justify-between px-1">
+          <Text variant="muted" className="text-sm">
+            Replying to {replyingTo.author.name ?? `@${replyingTo.author.slug}`}
+          </Text>
           <Pressable onPress={onCancelReply} hitSlop={8} accessibilityLabel="Cancel reply">
             <Icon as={X} size={16} className="text-muted-foreground" />
           </Pressable>
         </View>
-      ) : (
-        <Text variant="muted">Comment at {formatTime(atSeconds)}</Text>
       )}
       {gif && (
         <View className="self-start">
@@ -83,34 +105,46 @@ export function CommentComposer({ episodeId, atSeconds, replyingTo, onCancelRepl
           </Pressable>
         </View>
       )}
+      {/* One line that grows as it's written in, with the buttons kept at its
+          foot. The time a comment is at goes in the placeholder. */}
       <View className="flex-row items-end gap-2">
-        {gifs && (
-          <Pressable
-            onPress={togglePicker}
-            className={cn('h-10 justify-center border px-2', picking ? 'border-primary bg-primary' : 'border-input')}
-            accessibilityLabel={picking ? 'Close GIFs' : 'Add a GIF'}
-            accessibilityState={{ expanded: picking }}>
-            <Text className={cn('text-xs font-bold', picking ? 'text-primary-foreground' : 'text-foreground')}>GIF</Text>
-          </Pressable>
-        )}
+        <Pressable
+          onPress={togglePicker}
+          className={cn('h-10 w-10 items-center justify-center rounded-full', picking ? 'bg-primary' : 'active:bg-muted')}
+          accessibilityLabel={picking ? 'Close emoji and GIFs' : gifs ? 'Add an emoji or GIF' : 'Add an emoji'}
+          accessibilityState={{ expanded: picking }}>
+          <Icon as={Smile} size={22} className={picking ? 'text-primary-foreground' : 'text-muted-foreground'} />
+        </Pressable>
         <Textarea
           value={body}
-          onChangeText={setBody}
+          onChangeText={changeText}
+          onSelectionChange={({ nativeEvent }: TextInputSelectionChangeEvent) => {
+            selection.current = nativeEvent.selection
+          }}
           onFocus={() => setPicking(false)}
-          placeholder={replyingTo ? 'Write a reply…' : 'Add a comment…'}
+          placeholder={replyingTo ? 'Write a reply…' : `Comment at ${formatTime(atSeconds)}…`}
           maxLength={maxLength}
-          className="min-h-10 flex-1"
-          numberOfLines={3}
+          className="max-h-32 min-h-10 flex-1 resize-none rounded-3xl px-4 py-2"
+          // On web, the height it starts at (it grows to fit); on Android, the most lines it grows to.
+          numberOfLines={Platform.OS === 'web' ? 1 : 5}
         />
-        <Button onPress={post} disabled={(!body.trim() && !gif) || add.isPending}>
-          <Text>{add.isPending ? 'Posting…' : 'Post'}</Text>
-        </Button>
+        <Pressable
+          onPress={post}
+          disabled={!canPost}
+          className={cn(
+            'h-10 w-10 items-center justify-center rounded-full bg-primary active:opacity-80',
+            !canPost && 'opacity-40',
+          )}
+          accessibilityLabel={add.isPending ? 'Posting' : replyingTo ? 'Post reply' : 'Post comment'}>
+          <Icon as={SendHorizontal} size={18} className="text-primary-foreground" />
+        </Pressable>
       </View>
       {add.isError && <Text className="text-destructive">{add.error.message}</Text>}
-      {picking && gifs && (
-        <GifPicker
-          config={gifs}
-          onPick={(picked) => {
+      {picking && (
+        <ExpressionPicker
+          gifs={gifs}
+          onEmoji={insertEmoji}
+          onGif={(picked) => {
             setGif(picked)
             setPicking(false)
           }}

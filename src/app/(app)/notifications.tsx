@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Stack, useFocusEffect } from 'expo-router'
 import { useCallback, useState } from 'react'
 import { Linking, ScrollView, Switch, View } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Artwork } from '@/components/artwork'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
@@ -20,6 +21,7 @@ const queryKey = ['notification-settings']
 // own question, for the system.
 export default function NotificationsScreen() {
   const queryClient = useQueryClient()
+  const { bottom } = useSafeAreaInsets()
   const settings = useQuery({ queryKey, queryFn: () => api<NotificationSettings>('/api/mobile/notifications') })
   const [state, setState] = useState<PushState | null>(null)
 
@@ -46,7 +48,9 @@ export default function NotificationsScreen() {
   const data = settings.data
 
   return (
-    <ScrollView className="flex-1 bg-background" contentContainerClassName="gap-4 p-4">
+    <ScrollView className="flex-1 bg-background" contentContainerClassName="gap-4 p-4"
+      // Its end clears the system's navigation bar (the app draws edge to edge).
+      contentContainerStyle={{ paddingBottom: 16 + bottom }}>
       <Stack.Screen options={{ title: 'Notifications' }} />
       <DeviceState state={state} onEnable={() => void enableNotifications().then(setState)} />
       {data ? (

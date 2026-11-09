@@ -21,8 +21,8 @@ The share sheet and lock screen controls need native code, so the app runs in a
 bun install
 bun run android                # builds and installs a dev build on a device/emulator, then starts Metro
 bun run ios                    # the same for iOS (macOS only)
-# or build in the cloud:
-bunx eas-cli build --profile development --platform android
+# or a dev build with EAS, still on this machine (never EAS's cloud builders):
+bunx eas-cli build --profile development --platform android --local
 bun run start                  # just Metro, once a dev build is installed (rebuild after adding native modules)
 bun run web                    # the web build, for checking layouts, on http://localhost:19006
 ```
@@ -44,6 +44,36 @@ Provider sign-in only works against the server's own public address
 (`SITE_URL`, e.g. `https://podnoms.dev.fergl.ie:3000`), not `localhost:5173`:
 the provider sends the browser back to `SITE_URL`, and Auth.js's cookies have
 to be on the same host the sign-in started on.
+
+## Releasing
+
+Android builds go to Google Play's **internal testing** track from GitHub
+Actions (`.github/workflows/android-release.yml`): push a `v*` tag
+(`git tag v1.2.0 && git push origin v1.2.0`) or use Actions → Android release
+→ Run workflow. Promote to production in the Play Console. The job runs on a
+self-hosted runner, so builds stay on our own machine (iOS will get a job of
+its own on a runner on the MacBook); EAS holds the keystore,
+bumps the version code and does the upload (`eas.json`'s `submit.production`).
+
+Once:
+
+1. Start the runner: a container from the same image as intellibrand-go's
+   runner (`ci/github-runner/docker-compose.yml`; the image has Java 17, the
+   Android SDK and eas-cli). Copy `.env.example` to `.env` there and fill it
+   in, create its folders as your user (Docker would make them root's):
+   `mkdir -p $RUNNER_DATA/{runner,work,tmp,cache/{gradle,npm,bun}}`, then
+   `docker compose up -d`. It registers itself with the label
+   `podnoms-android` and shows under Settings → Actions → Runners.
+2. As the repo is public, set Settings → Actions → General → "Require approval
+   for all external contributors", so a fork can't run code on the runner (the
+   workflow never runs on pull requests anyway).
+3. Repo secrets (Settings → Secrets and variables → Actions):
+   - `EXPO_TOKEN`: an access token from expo.dev → Account settings.
+   - `GOOGLE_SERVICES_JSON_B64`: `base64 -w0 google-services.json`.
+
+The Play service account key has to be stored in EAS
+(`bunx eas-cli credentials` → Android → production → Google Service Account),
+as the job submits non-interactively.
 
 ## How it talks to PodNoms
 
@@ -92,7 +122,9 @@ Followers hear about shows going live and new episodes through Expo's push
 service. Builds need an EAS project and credentials, once:
 
 1. `bunx eas-cli init`, which adds the project id to `app.json`.
-2. Android: make a Firebase project with an Android app for `com.podnoms.mobile`,
+2. Android: make a Firebase project with an Android app for `com.podnoms.android`
+   (not `com.podnoms.mobile`: Play still holds that name from an old, closed
+   account, so the Android package differs from the iOS bundle id),
    put its `google-services.json` in the project root, set
    `"googleServicesFile": "./google-services.json"` under `expo.android` in
    `app.json`, and upload a service account key for FCM V1 with

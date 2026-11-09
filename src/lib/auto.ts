@@ -35,7 +35,7 @@ async function children(parentId: string): Promise<AutoItem[]> {
   if (parentId === 'following') {
     const home = await api<Home>('/api/mobile/home')
     return home.following.map((show) => ({
-      id: `show:${show.slug}`,
+      id: `show:${show.id}`,
       title: show.title,
       subtitle: show.author,
       artworkUrl: show.imageUrl,
@@ -43,9 +43,9 @@ async function children(parentId: string): Promise<AutoItem[]> {
     }))
   }
   if (parentId.startsWith('show:')) {
-    const slug = parentId.slice('show:'.length)
+    const showId = parentId.slice('show:'.length)
     const { show, episodes } = await api<ShowWithEpisodes>(
-      `/api/mobile/shows/${encodeURIComponent(slug)}?limit=${showEpisodeLimit}`,
+      `/api/mobile/shows/${encodeURIComponent(showId)}?limit=${showEpisodeLimit}`,
     )
     return episodes
       .filter((episode) => episode.status === 'ready' && episode.audioUrl)

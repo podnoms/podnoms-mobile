@@ -1,0 +1,59 @@
+# Builds the production .aab on the self-hosted runner (builds stay on our own
+# machine, never on EAS's or GitHub's builders) and sends it to Google Play's
+# internal testing track. EAS still holds the keystore, bumps the version code
+# and does the upload. Setup and secrets are in README.md, "Releasing".
+name: Android release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+# One release at a time, so two runs never claim the same version code.
+concurrency:
+  group: android-release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: [self-hosted, linux, podnoms-android]
+    timeout-minutes: 60
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # The runner image has Node 20, which eas-cli is dropping.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Write google-services.json
+        env:
+          GOOGLE_SERVICES_JSON_B64: ${{ secrets.GOOGLE_SERVICES_JSON_B64 }}
+        run: echo "$GOOGLE_SERVICES_JSON_B64" | base64 -d > google-services.json
+
+      - name: Build
+        run: bunx eas-cli build --platform android --profile production --local --non-interactive --output build.aab
+
+      - name: Submit to Play (internal testing)
+        run: bunx eas-cli submit --platform android --profile production --path build.aab --non-interactive
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-${{ github.ref_name }}-${{ github.run_number }}
+          path: build.aab
+          retention-days: 14
+
+      # The runner keeps its workspace between runs.
+      - name: Clean up
+        if: always()
+        run: rm -f build.aab google-services.json

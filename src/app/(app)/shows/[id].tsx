@@ -11,8 +11,8 @@ import { useShow } from '@/hooks/use-shows'
 import { pluralise } from '@/lib/format'
 
 export default function ShowScreen() {
-  const { slug } = useLocalSearchParams<{ slug: string }>()
-  const query = useShow(slug)
+  const { id } = useLocalSearchParams<{ id: string }>()
+  const query = useShow(id)
   const show = query.data?.show
 
   return (
@@ -61,7 +61,7 @@ export default function ShowScreen() {
           )
         }
       />
-      <MiniPlayer />
+      <MiniPlayer safeArea />
     </View>
   )
 }

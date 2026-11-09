@@ -45,3 +45,14 @@ example
 
 google-services.json
 *.apk
+*.aab
+
+# self-hosted runner secrets
+ci/github-runner/.env
+modules/*/android/app/build/
+
+# Gradle cache and Eclipse JDT output from VS Code's Java extensions importing
+# the module's build.gradle (turned off in .vscode/settings.json)
+modules/*/android/.gradle/
+modules/*/android/bin/
+.github/modernize/

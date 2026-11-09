@@ -4,6 +4,7 @@
 // follows), both providers require searches and GIF files to go straight
 // between the listener's device and them, and the chosen GIF's URL to be kept
 // exactly as the provider gave it; the server only takes their own URLs.
+import { Image } from 'react-native'
 import type { CommentGif } from '@/lib/api-types'
 
 export type GifConfig = { provider: 'klipy' | 'giphy'; key: string }
@@ -116,4 +117,50 @@ export const gifAttribution: Record<GifConfig['provider'], string | null> = {
 // The GIF as a comment carries it, without the picker's preview.
 export function commentGif({ preview: _preview, ...gif }: GifResult): CommentGif {
   return gif
+}
+
+// --- GIFs a keyboard typed in -------------------------------------------------
+// Keyboards' own GIF pickers (SwiftKey's, say) send a GIF as an image, which
+// React Native's TextInput doesn't take, so they type its link instead. A link
+// to KLIPY's or GIPHY's own servers is made the comment's GIF, as the server
+// takes those (its src/lib/gifs.ts, whose hosts these are), keeping the URL
+// exactly as the keyboard gave it.
+
+const mediaHosts: Record<GifConfig['provider'], RegExp> = {
+  klipy: /^static\d*\.klipy\.com$/,
+  giphy: /^(media\d*|i)\.giphy\.com$/,
+}
+
+export type GifLink = { provider: GifConfig['provider']; url: string; rest: string }
+
+// The first GIF link in the text, and the text without it; null if there's none.
+export function findGifLink(text: string): GifLink | null {
+  for (const match of text.matchAll(/https:\/\/\S+/g)) {
+    let host: string
+    try {
+      host = new URL(match[0]).hostname
+    } catch {
+      continue
+    }
+    const provider = (Object.keys(mediaHosts) as GifConfig['provider'][]).find((name) => mediaHosts[name].test(host))
+    if (!provider) continue
+    const rest = (text.slice(0, match.index) + text.slice(match.index + match[0].length)).replace(/[ \t]{2,}/g, ' ').trim()
+    return { provider, url: match[0], rest }
+  }
+  return null
+}
+
+// The linked GIF, with its size read from the image itself, as the server needs it.
+export async function gifFromLink({ provider, url }: GifLink): Promise<GifResult> {
+  const { width, height } = await Image.getSize(url)
+  return {
+    provider,
+    // The links don't share a shape, but the path is the GIF's own.
+    id: new URL(url).pathname.slice(0, 200),
+    title: '',
+    url,
+    width: Math.round(width),
+    height: Math.round(height),
+    preview: { url, width: Math.round(width), height: Math.round(height) },
+  }
 }

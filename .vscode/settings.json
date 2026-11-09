@@ -1,4 +1,7 @@
 {
+  "java.import.gradle.enabled": false,
+  "java.import.maven.enabled": false,
+  "gradle.autoDetect": "off",
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit",
     "source.organizeImports": "explicit",

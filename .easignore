@@ -50,3 +50,6 @@ example
 
 /ios
 /android
+
+# CI runner setup
+ci/
