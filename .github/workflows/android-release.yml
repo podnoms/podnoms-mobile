@@ -6,7 +6,7 @@ name: Android release
 
 on:
   push:
-    tags: ['v*']
+    tags: ["v*"]
   workflow_dispatch:
 
 # One release at a time, so two runs never claim the same version code.
@@ -19,7 +19,7 @@ permissions:
 
 jobs:
   release:
-    runs-on: [self-hosted, linux, podnoms-android]
+    runs-on: [self-hosted, linux, podnoms-android-runner]
     timeout-minutes: 60
     env:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
