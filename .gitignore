@@ -44,6 +44,7 @@ example
 /android
 
 google-services.json
+play-service-account.json
 *.apk
 *.aab
 

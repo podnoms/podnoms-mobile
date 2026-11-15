@@ -52,4 +52,6 @@ example
 /android
 
 # CI runner setup
-ci/
+scripts/ci/
+
+play-service-account.json

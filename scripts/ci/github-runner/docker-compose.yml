@@ -14,7 +14,7 @@ services:
       GITHUB_REPO: podnoms/podnoms-mobile
       REG_TOKEN: ${REG_TOKEN:-}
       RUNNER_NAME: podnoms-android-runner
-      RUNNER_LABELS: self-hosted,linux,x64,podnoms-android
+      RUNNER_LABELS: self-hosted,linux,x64,podnoms-android-runner
       GRADLE_USER_HOME: /cache/gradle
       npm_config_cache: /cache/npm
       BUN_INSTALL_CACHE_DIR: /cache/bun

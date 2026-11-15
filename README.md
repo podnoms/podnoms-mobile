@@ -63,7 +63,7 @@ Once:
 1. Start the runner: `scripts/start-runner.sh` (`bun run runner`). It builds
    the image in `scripts/ci/github-runner/` (Java 17, the Android SDK and NDK, Node)
    and starts it as the container `podnoms-android-runner`, which registers
-   itself with the label `podnoms-android` and shows under Settings → Actions
+   itself with the label `podnoms-android-runner` and shows under Settings → Actions
    → Runners. The registration token comes from `gh`, which has to be signed
    in as an admin of the repo. The runner's install, work folder and caches
    (Gradle, npm, bun) are kept in `/srv/dev/podnoms/working/github-workers/podnoms-mobile`
@@ -75,10 +75,11 @@ Once:
 3. Repo secrets (Settings → Secrets and variables → Actions):
    - `EXPO_TOKEN`: an access token from expo.dev → Account settings.
    - `GOOGLE_SERVICES_JSON_B64`: `base64 -w0 google-services.json`.
-
-The Play service account key has to be stored in EAS
-(`bunx eas-cli credentials` → Android → production → Google Service Account),
-as the job submits non-interactively.
+   - `PLAY_SERVICE_ACCOUNT_JSON_B64`: the same for the key of a Google Cloud
+     service account that's invited in the Play Console (Users and
+     permissions) to release the app to testing tracks. The job writes it to
+     `play-service-account.json`, where `eas.json`'s `serviceAccountKeyPath`
+     looks, so the key isn't stored in EAS.
 
 ## How it talks to PodNoms
 
