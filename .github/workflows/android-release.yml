@@ -26,7 +26,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # The runner image has Node 20, which eas-cli is dropping.
+      # The version eas-cli is run with, whatever the runner's image has.
       - uses: actions/setup-node@v4
         with:
           node-version: 22

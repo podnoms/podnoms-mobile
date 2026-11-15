@@ -1,0 +1,35 @@
+# podnoms-mobile's self-hosted GitHub Actions runner. Start it with
+# scripts/start-runner.sh, which sets RUNNER_DATA, RUNNER_UID and (the first
+# time) REG_TOKEN.
+services:
+  runner:
+    build:
+      context: .
+      args:
+        RUNNER_UID: ${RUNNER_UID:-1000}
+    image: podnoms-android-runner:latest
+    container_name: podnoms-android-runner
+    restart: unless-stopped
+    environment:
+      GITHUB_REPO: podnoms/podnoms-mobile
+      REG_TOKEN: ${REG_TOKEN:-}
+      RUNNER_NAME: podnoms-android-runner
+      RUNNER_LABELS: self-hosted,linux,x64,podnoms-android
+      GRADLE_USER_HOME: /cache/gradle
+      npm_config_cache: /cache/npm
+      BUN_INSTALL_CACHE_DIR: /cache/bun
+
+    # No Docker socket: EAS local builds don't need one, and this repo is public.
+    volumes:
+      - ${RUNNER_DATA:?run scripts/start-runner.sh}/cache/gradle:/cache/gradle
+      - ${RUNNER_DATA}/cache/npm:/cache/npm
+      - ${RUNNER_DATA}/cache/bun:/cache/bun
+      # Checkouts, and the tools setup-node and co. download.
+      - ${RUNNER_DATA}/work:/home/runner/actions-runner/_work
+      # The runner's own install and registration, so its auto-updater can
+      # write new binaries and a restart doesn't need registering again.
+      - ${RUNNER_DATA}/runner:/home/runner/actions-runner
+      # EAS local builds write several GB under /tmp.
+      - ${RUNNER_DATA}/tmp:/tmp
+
+    shm_size: "4gb"

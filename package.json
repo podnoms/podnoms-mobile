@@ -12,7 +12,8 @@
     "web": "expo start --web --port 19006",
     "lint": "expo lint",
     "auto": "scripts/android-auto.sh",
-    "release": "scripts/create-release.sh"
+    "release": "scripts/create-release.sh",
+    "runner": "scripts/start-runner.sh"
   },
   "dependencies": {
     "@expo/ui": "~58.0.27",

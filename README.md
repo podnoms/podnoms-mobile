@@ -60,13 +60,15 @@ bumps the version code and does the upload (`eas.json`'s `submit.production`).
 
 Once:
 
-1. Start the runner: a container from the same image as intellibrand-go's
-   runner (`ci/github-runner/docker-compose.yml`; the image has Java 17, the
-   Android SDK and eas-cli). Copy `.env.example` to `.env` there and fill it
-   in, create its folders as your user (Docker would make them root's):
-   `mkdir -p $RUNNER_DATA/{runner,work,tmp,cache/{gradle,npm,bun}}`, then
-   `docker compose up -d`. It registers itself with the label
-   `podnoms-android` and shows under Settings → Actions → Runners.
+1. Start the runner: `scripts/start-runner.sh` (`bun run runner`). It builds
+   the image in `scripts/ci/github-runner/` (Java 17, the Android SDK and NDK, Node)
+   and starts it as the container `podnoms-android-runner`, which registers
+   itself with the label `podnoms-android` and shows under Settings → Actions
+   → Runners. The registration token comes from `gh`, which has to be signed
+   in as an admin of the repo. The runner's install, work folder and caches
+   (Gradle, npm, bun) are kept in `/srv/dev/podnoms/working/github-workers/podnoms-mobile`
+   (`PODNOMS_RUNNER_DATA` to change it), so they outlive the container. Run
+   it again after changing the image; `--reregister` registers afresh.
 2. As the repo is public, set Settings → Actions → General → "Require approval
    for all external contributors", so a fork can't run code on the runner (the
    workflow never runs on pull requests anyway).

@@ -48,7 +48,7 @@ google-services.json
 *.aab
 
 # self-hosted runner secrets
-ci/github-runner/.env
+scripts/ci/github-runner/.env
 modules/*/android/app/build/
 
 # Gradle cache and Eclipse JDT output from VS Code's Java extensions importing
