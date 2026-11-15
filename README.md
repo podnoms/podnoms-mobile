@@ -49,8 +49,11 @@ to be on the same host the sign-in started on.
 
 Android builds go to Google Play's **internal testing** track from GitHub
 Actions (`.github/workflows/android-release.yml`): push a `v*` tag
-(`git tag v1.2.0 && git push origin v1.2.0`) or use Actions → Android release
-→ Run workflow. Promote to production in the Play Console. The job runs on a
+(`scripts/create-release.sh --patch`, `--minor` or `--major`, which bumps the
+version in `app.json` and `package.json`, commits, tags and pushes), or run it
+on the current branch without a
+tag (`scripts/create-release.sh`, or Actions → Android release
+→ Run workflow). Promote to production in the Play Console. The job runs on a
 self-hosted runner, so builds stay on our own machine (iOS will get a job of
 its own on a runner on the MacBook); EAS holds the keystore,
 bumps the version code and does the upload (`eas.json`'s `submit.production`).
