@@ -1,6 +1,6 @@
 {
   "name": "podnoms-mobile",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "license": "MIT",
   "main": "index.ts",
   "scripts": {
