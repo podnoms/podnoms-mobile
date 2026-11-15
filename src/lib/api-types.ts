@@ -49,6 +49,8 @@ export type Episode = {
   createdAt: string
   publishedAt: string | null
   positionSeconds: number
+  // Whether the user has played it, or marked it so.
+  played: boolean
   progress: EpisodeProgress | null
 }
 

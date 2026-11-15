@@ -1,25 +1,35 @@
 import { router } from 'expo-router'
-import { Pause, Play, RotateCcw, Trash2 } from 'lucide-react-native'
+import { Check, Pause, Play, RotateCcw, Trash2, Undo2, type LucideIcon } from 'lucide-react-native'
+import { useRef } from 'react'
 import { Alert, Pressable, View } from 'react-native'
+import Swipeable, { SwipeDirection, type SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable'
 import { Artwork } from '@/components/artwork'
 import { StatusBadge } from '@/components/status-badge'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { Progress } from '@/components/ui/progress'
 import { Text } from '@/components/ui/text'
+import { useMarkPlayed } from '@/hooks/use-played'
 import { useDeleteEpisode, useRetryEpisode } from '@/hooks/use-shows'
 import type { Episode, Show } from '@/lib/api-types'
 import { describeProgress, formatDate, formatDuration } from '@/lib/format'
 import { usePlayer } from '@/lib/player'
+import { cn } from '@/lib/utils'
+
+// How far a row is dragged before letting go marks it.
+const swipeThresholdPx = 72
 
 // An episode in a show's list: opens its page (with comments) and plays it
 // from its button when it's ready. On the user's own shows, also shows how
 // it's coming along while it's being made, and can be retried or deleted when
-// that failed.
+// that failed. A ready one is dragged left to mark it as played, and right to
+// mark it as unplayed again.
 export function EpisodeRow({ episode, show }: { episode: Episode; show: Show }) {
   const player = usePlayer()
   const retry = useRetryEpisode()
   const remove = useDeleteEpisode()
+  const markPlayed = useMarkPlayed()
+  const swipeable = useRef<SwipeableMethods>(null)
   const isCurrent = player.episode?.id === episode.id
   const isPlaying = isCurrent && player.status.playing
   const playable = episode.status === 'ready' && episode.audioUrl
@@ -45,24 +55,34 @@ export function EpisodeRow({ episode, show }: { episode: Episode; show: Show }) 
   function confirmDelete() {
     Alert.alert('Delete episode?', `"${episode.title}" will be removed from the show and its feed.`, [
       { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: () => remove.mutate(episode.id) },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () => remove.mutate(episode.id),
+      },
     ])
   }
 
-  return (
+  const row = (
     <Pressable
       onPress={() => router.push({ pathname: '/episodes/[id]', params: { id: episode.id } })}
-      className="gap-2 border-b border-border px-4 py-3 active:bg-muted"
+      className="gap-2 border-b border-border bg-background px-4 py-3 active:bg-muted"
       accessibilityRole="link"
       accessibilityLabel={episode.title}>
       <View className="flex-row gap-3">
         <Artwork uri={episode.imageUrl ?? show.imageUrl} size={56} />
         <View className="flex-1 gap-1">
-          <Text className="font-medium" numberOfLines={2}>
+          <Text className={cn('font-medium', episode.played && 'text-muted-foreground')} numberOfLines={2}>
             {episode.title}
           </Text>
           <View className="flex-row flex-wrap items-center gap-2">
             <StatusBadge status={episode.status} isPrivate={episode.private} />
+            {episode.played && (
+              <View className="flex-row items-center gap-1">
+                <Icon as={Check} size={14} className="text-muted-foreground" />
+                <Text variant="muted">Played</Text>
+              </View>
+            )}
             <Text variant="muted">
               {[formatDate(episode.publishedAt ?? episode.createdAt), formatDuration(episode.durationSeconds)]
                 .filter(Boolean)
@@ -80,7 +100,7 @@ export function EpisodeRow({ episode, show }: { episode: Episode; show: Show }) 
           </Pressable>
         )}
       </View>
-      {playable && listened > 0 && <Progress value={listened * 100} className="h-1" />}
+      {playable && !episode.played && listened > 0 && <Progress value={listened * 100} className="h-1" />}
       {progress && (
         <View className="gap-1">
           <Text variant="muted">{progress.label}</Text>
@@ -107,5 +127,51 @@ export function EpisodeRow({ episode, show }: { episode: Episode; show: Show }) 
         </View>
       )}
     </Pressable>
+  )
+
+  if (!playable) return row
+  // Only the side that would change something can be dragged open. The
+  // action fills the row, so the row slides away over it; it's back in place
+  // by the time it's listed again.
+  return (
+    <Swipeable
+      ref={swipeable}
+      friction={1.5}
+      overshootLeft={false}
+      overshootRight={false}
+      leftThreshold={swipeThresholdPx}
+      rightThreshold={swipeThresholdPx}
+      renderRightActions={episode.played ? undefined : () => <SwipeAction icon={Check} label="Played" side="right" />}
+      renderLeftActions={episode.played ? () => <SwipeAction icon={Undo2} label="Unplayed" side="left" /> : undefined}
+      onSwipeableOpen={(direction) => {
+        swipeable.current?.close()
+        markPlayed(episode, direction === SwipeDirection.LEFT)
+      }}>
+      {row}
+    </Swipeable>
+  )
+}
+
+// What shows behind a row as it's dragged, at the side it's dragged from.
+function SwipeAction({ icon, label, side }: { icon: LucideIcon; label: string; side: 'left' | 'right' }) {
+  return (
+    <View
+      className={cn(
+        'w-full flex-row items-center gap-2 px-6',
+        side === 'right' ? 'justify-end bg-primary' : 'bg-secondary',
+      )}>
+      <Icon
+        as={icon}
+        size={18}
+        className={side === 'right' ? 'text-primary-foreground' : 'text-secondary-foreground'}
+      />
+      <Text
+        className={cn(
+          'text-sm font-medium',
+          side === 'right' ? 'text-primary-foreground' : 'text-secondary-foreground',
+        )}>
+        {label}
+      </Text>
+    </View>
   )
 }

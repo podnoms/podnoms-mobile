@@ -6,6 +6,7 @@
 import { createAudioPlayer, setAudioModeAsync, type AudioStatus } from 'expo-audio'
 import * as PodnomsAuto from '../../modules/podnoms-auto'
 import { api, authHeaders } from '@/lib/api'
+import { setPlayed } from '@/lib/played'
 import { queryClient } from '@/lib/query-client'
 
 export type PlayableEpisode = {
@@ -23,7 +24,8 @@ type PlayerState = { episode: PlayableEpisode | null; rate: number }
 // How often the position is saved while playing.
 const saveEveryMs = 15_000
 
-// Positions this close to the end count as finished, and are cleared.
+// Positions this close to the end count as finished: they're cleared, and the
+// episode marked as played.
 const finishedWithinSeconds = 30
 
 export const playbackRates = [0.8, 1, 1.25, 1.5, 1.75, 2]
@@ -65,12 +67,25 @@ function savePosition(episodeId: string, seconds: number) {
   void api(`/api/mobile/episodes/${episodeId}/position`, { method: 'POST', body: { seconds } }).catch(() => {})
 }
 
+// The episode last marked as played here, so it's only sent once.
+let finishedId: string | null = null
+
+function markFinished(episodeId: string) {
+  if (finishedId === episodeId) return
+  finishedId = episodeId
+  setPlayed(episodeId, true).catch(() => {
+    if (finishedId === episodeId) finishedId = null
+  })
+}
+
 function saveCurrentPosition() {
   const { episode } = state
   if (!episode || pendingSeek !== null) return
   const duration = player.duration || episode.durationSeconds || 0
   const finished = duration > 0 && player.currentTime > duration - finishedWithinSeconds
   savePosition(episode.id, finished ? 0 : player.currentTime)
+  if (finished) markFinished(episode.id)
+  else if (finishedId === episode.id) finishedId = null
   void queryClient.invalidateQueries({ queryKey: ['continue-listening'] })
 }
 
@@ -95,6 +110,7 @@ player.addListener('playbackStatusUpdate', (status: AudioStatus) => {
 
   if (status.didJustFinish && state.episode) {
     savePosition(state.episode.id, 0)
+    markFinished(state.episode.id)
     void queryClient.invalidateQueries({ queryKey: ['continue-listening'] })
   }
 })

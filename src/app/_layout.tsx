@@ -8,7 +8,9 @@ import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 import { useEffect } from 'react'
 import { Platform } from 'react-native'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { KeyboardProvider } from 'react-native-keyboard-controller'
+import { ToastProvider } from '@/components/toast'
 import { AppearanceProvider, useAppearance } from '@/lib/appearance'
 import { AuthProvider, useAuth } from '@/lib/auth'
 import { PlayerProvider } from '@/lib/player'
@@ -22,17 +24,22 @@ export default function RootLayout() {
     // First, as expo-share-intent asks, so a share is caught before anything
     // else loads. Browsers can't share to the app.
     <ShareIntentProvider options={{ disabled: Platform.OS === 'web' }}>
-      <KeyboardProvider>
-        <QueryClientProvider client={queryClient}>
-          <AuthProvider>
-            <AppearanceProvider>
-              <PlayerProvider>
-                <Themed />
-              </PlayerProvider>
-            </AppearanceProvider>
-          </AuthProvider>
-        </QueryClientProvider>
-      </KeyboardProvider>
+      {/* For swiping episodes in a show's list. */}
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <KeyboardProvider>
+          <QueryClientProvider client={queryClient}>
+            <AuthProvider>
+              <AppearanceProvider>
+                <PlayerProvider>
+                  <ToastProvider>
+                    <Themed />
+                  </ToastProvider>
+                </PlayerProvider>
+              </AppearanceProvider>
+            </AuthProvider>
+          </QueryClientProvider>
+        </KeyboardProvider>
+      </GestureHandlerRootView>
     </ShareIntentProvider>
   )
 }
