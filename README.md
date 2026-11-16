@@ -60,7 +60,9 @@ bumps the version code, and the `.aab` goes straight to Play's API from the
 runner (`r0adkll/upload-google-play`, not `eas submit`, which queues on EAS).
 A tag's run also makes a universal APK from the `.aab` with `bundletool`
 (signed with the same upload key) and creates a GitHub release for the tag
-with the APK attached.
+with the APK attached. To build a production APK on this machine instead,
+`scripts/build-android.sh` (`bun run build:android`; `--install` puts it on
+the phone over adb) writes `dist/podnoms-v<version>.apk`.
 
 Once:
 
