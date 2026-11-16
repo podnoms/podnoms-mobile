@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: read
+  contents: write # to create the GitHub release
 
 jobs:
   release:
@@ -54,13 +54,28 @@ jobs:
       - name: Submit to Play (internal testing)
         run: bunx eas-cli submit --platform android --profile production --path build.aab --non-interactive
 
+      # An APK to sideload, attached to the GitHub release. production-apk
+      # doesn't bump the version code, so it has the same one as the .aab.
+      - name: Build APK
+        run: bunx eas-cli build --platform android --profile production-apk --local --non-interactive --output podnoms-${{ github.ref_name }}.apk
+
       - uses: actions/upload-artifact@v4
         with:
           name: android-${{ github.ref_name }}-${{ github.run_number }}
-          path: build.aab
+          path: |
+            build.aab
+            podnoms-${{ github.ref_name }}.apk
           retention-days: 14
+
+      # A pushed tag only shows under Tags; this makes it a release, with the APK.
+      - name: Create GitHub release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: podnoms-${{ github.ref_name }}.apk
 
       # The runner keeps its workspace between runs.
       - name: Clean up
         if: always()
-        run: rm -f build.aab google-services.json play-service-account.json
+        run: rm -f build.aab *.apk google-services.json play-service-account.json

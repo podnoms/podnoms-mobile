@@ -35,7 +35,7 @@
     "titleBar.activeForeground": "#e7e7e7",
     "titleBar.inactiveBackground": "#10337599",
     "titleBar.inactiveForeground": "#e7e7e799"
-},
+  },
   "peacock.color": "#103375",
   "workbench.colorTheme": "Dark 2026"
 }

@@ -57,6 +57,8 @@ tag (`scripts/create-release.sh`, or Actions → Android release
 self-hosted runner, so builds stay on our own machine (iOS will get a job of
 its own on a runner on the MacBook); EAS holds the keystore,
 bumps the version code and does the upload (`eas.json`'s `submit.production`).
+A tag's run also builds an APK (the `production-apk` profile, same version
+code) and creates a GitHub release for the tag with the APK attached.
 
 Once:
 
