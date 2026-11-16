@@ -56,7 +56,8 @@ tag (`scripts/create-release.sh`, or Actions → Android release
 → Run workflow). Promote to production in the Play Console. The job runs on a
 self-hosted runner, so builds stay on our own machine (iOS will get a job of
 its own on a runner on the MacBook); EAS holds the keystore,
-bumps the version code and does the upload (`eas.json`'s `submit.production`).
+bumps the version code, and the `.aab` goes straight to Play's API from the
+runner (`r0adkll/upload-google-play`, not `eas submit`, which queues on EAS).
 A tag's run also builds an APK (the `production-apk` profile, same version
 code) and creates a GitHub release for the tag with the APK attached.
 

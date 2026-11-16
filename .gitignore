@@ -57,3 +57,4 @@ modules/*/android/app/build/
 modules/*/android/.gradle/
 modules/*/android/bin/
 .github/modernize/
+.vscode/

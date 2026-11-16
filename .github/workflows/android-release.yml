@@ -1,8 +1,8 @@
 # Builds the production .aab on the self-hosted runner (builds stay on our own
 # machine, never on EAS's or GitHub's builders) and sends it to Google Play's
-# internal testing track. EAS still holds the keystore, bumps the version code
-# and does the upload, with the Play key from a secret. Setup and secrets are
-# in README.md, "Releasing".
+# internal testing track. EAS still holds the keystore and bumps the version
+# code; the upload goes straight to Play's API, with the key from a secret.
+# Setup and secrets are in README.md, "Releasing".
 name: Android release
 
 on:
@@ -45,14 +45,22 @@ jobs:
       - name: Build
         run: bunx eas-cli build --platform android --profile production --local --non-interactive --output build.aab
 
-      # eas.json's submit.production reads the key from this file.
+      # The Play upload below reads the key from this file.
       - name: Write the Play service account key
         env:
           PLAY_SERVICE_ACCOUNT_JSON_B64: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON_B64 }}
         run: echo "$PLAY_SERVICE_ACCOUNT_JSON_B64" | base64 -d > play-service-account.json
 
+      # Straight to the Play Developer API from the runner: eas submit runs on
+      # EAS's servers and waits in their queue.
       - name: Submit to Play (internal testing)
-        run: bunx eas-cli submit --platform android --profile production --path build.aab --non-interactive
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: play-service-account.json
+          packageName: com.podnoms.android
+          releaseFiles: build.aab
+          track: internal
+          status: completed
 
       # An APK to sideload, attached to the GitHub release. production-apk
       # doesn't bump the version code, so it has the same one as the .aab.
