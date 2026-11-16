@@ -59,13 +59,28 @@ jobs:
           serviceAccountJson: play-service-account.json
           packageName: com.podnoms.android
           releaseFiles: build.aab
-          track: internal
+          tracks: internal
           status: completed
 
-      # An APK to sideload, attached to the GitHub release. production-apk
-      # doesn't bump the version code, so it has the same one as the .aab.
-      - name: Build APK
-        run: bunx eas-cli build --platform android --profile production-apk --local --non-interactive --output podnoms-${{ github.ref_name }}.apk
+      # An APK to sideload, attached to the GitHub release: bundletool makes a
+      # universal APK from the .aab (seconds, where a second EAS build took
+      # minutes), signed with the same upload key, which EAS's build doesn't
+      # leave behind, so it comes from secrets.
+      - name: Make APK from the .aab
+        env:
+          BUNDLETOOL_VERSION: 1.18.1
+          ANDROID_KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          jar="$RUNNER_TOOL_CACHE/bundletool-$BUNDLETOOL_VERSION.jar"
+          [ -f "$jar" ] || curl -fsSL -o "$jar" "https://github.com/google/bundletool/releases/download/$BUNDLETOOL_VERSION/bundletool-all-$BUNDLETOOL_VERSION.jar"
+          echo "$ANDROID_KEYSTORE_B64" | base64 -d > upload.jks
+          java -jar "$jar" build-apks --bundle=build.aab --output=build.apks --mode=universal --overwrite \
+            --ks=upload.jks --ks-pass=env:ANDROID_KEYSTORE_PASSWORD \
+            --ks-key-alias="$ANDROID_KEY_ALIAS" --key-pass=env:ANDROID_KEY_PASSWORD
+          unzip -p build.apks universal.apk > podnoms-${{ github.ref_name }}.apk
 
       - uses: actions/upload-artifact@v4
         with:
@@ -86,4 +101,4 @@ jobs:
       # The runner keeps its workspace between runs.
       - name: Clean up
         if: always()
-        run: rm -f build.aab *.apk google-services.json play-service-account.json
+        run: rm -f build.aab build.apks *.apk upload.jks google-services.json play-service-account.json

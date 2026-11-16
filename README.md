@@ -58,8 +58,9 @@ self-hosted runner, so builds stay on our own machine (iOS will get a job of
 its own on a runner on the MacBook); EAS holds the keystore,
 bumps the version code, and the `.aab` goes straight to Play's API from the
 runner (`r0adkll/upload-google-play`, not `eas submit`, which queues on EAS).
-A tag's run also builds an APK (the `production-apk` profile, same version
-code) and creates a GitHub release for the tag with the APK attached.
+A tag's run also makes a universal APK from the `.aab` with `bundletool`
+(signed with the same upload key) and creates a GitHub release for the tag
+with the APK attached.
 
 Once:
 
@@ -81,8 +82,14 @@ Once:
    - `PLAY_SERVICE_ACCOUNT_JSON_B64`: the same for the key of a Google Cloud
      service account that's invited in the Play Console (Users and
      permissions) to release the app to testing tracks. The job writes it to
-     `play-service-account.json`, where `eas.json`'s `serviceAccountKeyPath`
-     looks, so the key isn't stored in EAS.
+     `play-service-account.json` for the upload (also where `eas.json`'s
+     `serviceAccountKeyPath` looks, for a manual `eas submit`), so the key
+     isn't stored in EAS.
+   - `ANDROID_KEYSTORE_B64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`,
+     `ANDROID_KEY_PASSWORD`: the upload keystore EAS holds, to sign the APK.
+     `bunx eas-cli credentials -p android` → production → Keystore → Download
+     existing keystore saves the `.jks` and shows the passwords and alias;
+     `base64 -w0` the `.jks` for the first.
 
 ## How it talks to PodNoms
 
