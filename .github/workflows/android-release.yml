@@ -76,7 +76,7 @@ jobs:
         run: |
           jar="$RUNNER_TOOL_CACHE/bundletool-$BUNDLETOOL_VERSION.jar"
           [ -f "$jar" ] || curl -fsSL -o "$jar" "https://github.com/google/bundletool/releases/download/$BUNDLETOOL_VERSION/bundletool-all-$BUNDLETOOL_VERSION.jar"
-          echo "$ANDROID_KEYSTORE_B64" | base64 -d > upload.jks
+          printf '%s' "$ANDROID_KEYSTORE_B64" | tr -d '[:space:]' | base64 -d > upload.jks
           java -jar "$jar" build-apks --bundle=build.aab --output=build.apks --mode=universal --overwrite \
             --ks=upload.jks --ks-pass=env:ANDROID_KEYSTORE_PASSWORD \
             --ks-key-alias="$ANDROID_KEY_ALIAS" --key-pass=env:ANDROID_KEY_PASSWORD
