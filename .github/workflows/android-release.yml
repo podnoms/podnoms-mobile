@@ -77,9 +77,12 @@ jobs:
           jar="$RUNNER_TOOL_CACHE/bundletool-$BUNDLETOOL_VERSION.jar"
           [ -f "$jar" ] || curl -fsSL -o "$jar" "https://github.com/google/bundletool/releases/download/$BUNDLETOOL_VERSION/bundletool-all-$BUNDLETOOL_VERSION.jar"
           printf '%s' "$ANDROID_KEYSTORE_B64" | tr -d '[:space:]' | base64 -d > upload.jks
+          # bundletool takes passwords as pass: or file:; files keep them off the command line.
+          printf '%s' "$ANDROID_KEYSTORE_PASSWORD" > ks.pass
+          printf '%s' "$ANDROID_KEY_PASSWORD" > key.pass
           java -jar "$jar" build-apks --bundle=build.aab --output=build.apks --mode=universal --overwrite \
-            --ks=upload.jks --ks-pass=env:ANDROID_KEYSTORE_PASSWORD \
-            --ks-key-alias="$ANDROID_KEY_ALIAS" --key-pass=env:ANDROID_KEY_PASSWORD
+            --ks=upload.jks --ks-pass=file:ks.pass \
+            --ks-key-alias="$ANDROID_KEY_ALIAS" --key-pass=file:key.pass
           unzip -p build.apks universal.apk > podnoms-${{ github.ref_name }}.apk
 
       - uses: actions/upload-artifact@v4
@@ -101,4 +104,4 @@ jobs:
       # The runner keeps its workspace between runs.
       - name: Clean up
         if: always()
-        run: rm -f build.aab build.apks *.apk upload.jks google-services.json play-service-account.json
+        run: rm -f build.aab build.apks *.apk upload.jks ks.pass key.pass google-services.json play-service-account.json
