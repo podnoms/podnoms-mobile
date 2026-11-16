@@ -76,7 +76,7 @@ if [ -n "$bump" ]; then
   # Only the first "version" in each file: the app's own.
   sed -i "0,/\"version\": \"$current\"/s//\"version\": \"$version\"/" app.json package.json
   git commit --quiet -m "Release $tag" app.json package.json
-  git tag "$tag"
+  git tag -a "$tag" -m "Release $tag"
   # Together, so the tag never goes up without its commit on the branch.
   git push --atomic origin "$branch" "$tag"
   echo "Pushed $tag."
@@ -89,7 +89,25 @@ else
   echo "Started the release from $branch."
 fi
 
-# The run takes a few seconds to show up.
-sleep 5
-gh run list --workflow "$workflow" --limit 1 --json url --jq '.[0].url'
-echo "Follow it with: gh run watch"
+# Find the run this started (it takes a few seconds to show up) and watch it.
+head=$(git rev-parse HEAD)
+if [ -n "$bump" ]; then
+  event=push ref=$tag
+else
+  event=workflow_dispatch ref=$branch
+fi
+run_id=
+for _ in $(seq 1 30); do
+  run_id=$(gh run list --workflow "$workflow" --event "$event" --commit "$head" \
+    --json databaseId,headBranch --jq ".[] | select(.headBranch == \"$ref\") | .databaseId" | head -n 1)
+  [ -n "$run_id" ] && break
+  sleep 2
+done
+if [ -z "$run_id" ]; then
+  echo "No run showed up; see: gh run list --workflow $workflow" >&2
+  exit 1
+fi
+gh run watch "$run_id" --exit-status || {
+  echo "The release failed: gh run view $run_id --log-failed" >&2
+  exit 1
+}
