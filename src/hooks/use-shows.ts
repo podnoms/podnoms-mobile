@@ -1,6 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { queryOptions, useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api'
-import type { ContinueListeningEpisode, Home, Show, ShowWithEpisodes, User } from '@/lib/api-types'
+import type { ContinueListeningEpisode, Episode, Home, Show, ShowWithEpisodes, User } from '@/lib/api-types'
 
 // How often a show's episodes are asked for again while any are being made.
 const processingRefetchMs = 5_000
@@ -19,8 +19,10 @@ export function useHome() {
   return useQuery({ queryKey: ['home'], queryFn: () => api<Home>('/api/mobile/home') })
 }
 
-export function useShow(id: string) {
-  return useQuery({
+// A show's page and its newest episodes, shared by its screen and Home's
+// newest episodes from the user's own shows.
+function showQuery(id: string) {
+  return queryOptions({
     queryKey: ['show', id],
     queryFn: () => api<ShowWithEpisodes>(`/api/mobile/shows/${encodeURIComponent(id)}?limit=100`),
     refetchInterval: (query) =>
@@ -29,6 +31,27 @@ export function useShow(id: string) {
         : false,
   })
 }
+
+export function useShow(id: string) {
+  return useQuery(showQuery(id))
+}
+
+// The newest episodes across the user's own shows, whether played or still
+// being made, each with its show.
+export function useYourLatestEpisodes(shows: Show[], limit: number) {
+  return useQueries({
+    queries: shows.map((show) => showQuery(show.id)),
+    combine: (results) => ({
+      isPending: results.some((result) => result.isPending),
+      episodes: results
+        .flatMap((result) => result.data?.episodes.map((episode) => ({ episode, show: result.data.show })) ?? [])
+        .sort((a, b) => latest(b.episode).localeCompare(latest(a.episode)))
+        .slice(0, limit),
+    }),
+  })
+}
+
+const latest = (episode: Episode) => episode.publishedAt ?? episode.createdAt
 
 // Whether a show is live now, from a small list every badge shares, so one
 // shows up within seconds wherever it's looking. Until that's loaded, what the

@@ -1,5 +1,6 @@
-// What Android Auto shows (modules/podnoms-auto): Continue listening, and the
-// shows the user follows with their episodes; an episode picked in the car
+// What Android Auto shows (modules/podnoms-auto): Continue listening, the
+// shows the user follows, and their own shows (a tab only if they have any),
+// each show with its episodes; an episode picked in the car
 // plays with the app's player. Set up when the app's JS starts, whether the
 // app was opened or the car started it headless (index.ts).
 import * as PodnomsAuto from '../../modules/podnoms-auto'
@@ -18,7 +19,40 @@ function progress(positionSeconds: number, durationSeconds: number | null) {
   return positionSeconds > 0 && durationSeconds ? positionSeconds / durationSeconds : null
 }
 
+// Home, which the tabs and two of them all ask for, kept briefly so opening
+// the library doesn't load it three times.
+const homeCacheMs = 30_000
+let homeCache: { at: number; home: Promise<Home> } | null = null
+
+function home() {
+  if (!homeCache || Date.now() - homeCache.at > homeCacheMs) {
+    const request = api<Home>('/api/mobile/home')
+    homeCache = { at: Date.now(), home: request }
+    request.catch(() => {
+      if (homeCache?.home === request) homeCache = null
+    })
+  }
+  return homeCache.home
+}
+
+const tab = (id: string, title: string): AutoItem => ({ id, title, playable: false })
+
+// The library's tabs. If Home can't be loaded, the ones everybody has, which
+// then say what's wrong when opened.
+async function tabs() {
+  const yours = await home().then(
+    (page) => page.yours.length > 0,
+    () => false,
+  )
+  return [
+    tab('continue', 'Continue listening'),
+    tab('following', 'Following'),
+    ...(yours ? [tab('yours', 'Your shows')] : []),
+  ]
+}
+
 async function children(parentId: string): Promise<AutoItem[]> {
+  if (parentId === 'root') return tabs()
   if (parentId === 'continue') {
     const episodes = await api<ContinueListeningEpisode[]>('/api/mobile/continue-listening')
     return episodes
@@ -33,11 +67,20 @@ async function children(parentId: string): Promise<AutoItem[]> {
       }))
   }
   if (parentId === 'following') {
-    const home = await api<Home>('/api/mobile/home')
-    return home.following.map((show) => ({
+    const { following } = await home()
+    return following.map((show) => ({
       id: `show:${show.id}`,
       title: show.title,
       subtitle: show.author,
+      artworkUrl: show.imageUrl,
+      playable: false,
+    }))
+  }
+  if (parentId === 'yours') {
+    const { yours } = await home()
+    return yours.map((show) => ({
+      id: `show:${show.id}`,
+      title: show.title,
       artworkUrl: show.imageUrl,
       playable: false,
     }))

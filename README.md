@@ -155,9 +155,9 @@ can't receive them.
 
 ## Android Auto
 
-In the car, PodNoms lists **Continue listening** and **Following** (the shows
-you follow, then each show's latest episodes); picking one plays it with the
-app's player. While anything plays, the car shows its controls, and playback
+In the car, PodNoms lists **Continue listening**, **Following** (the shows
+you follow, then each show's latest episodes) and, if you have shows of your
+own, **Your shows** (likewise); picking one plays it with the app's player. While anything plays, the car shows its controls, and playback
 pauses when the car disconnects, as with other media apps. This works with the
 app closed too: the car starts its JS without a screen.
 

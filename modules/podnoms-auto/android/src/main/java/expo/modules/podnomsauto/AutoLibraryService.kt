@@ -17,10 +17,12 @@ import androidx.media3.session.SessionError
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
+import com.google.common.util.concurrent.MoreExecutors
 
 // PodNoms's only media session on Android: the notification and lock screen,
 // headset and Bluetooth buttons, and Android Auto, with its library (Continue
-// listening, Following). Android Auto ignores a session other than the one its
+// listening, Following, Your shows: the tabs come from the app's JS, as it
+// knows whether the user has shows of their own). Android Auto ignores a session other than the one its
 // library hands it, so the app doesn't turn on expo-audio's own (see
 // player-engine.ts). The session lasts as long as the service, whatever the
 // app is playing, so the car never loses it; its player is swapped instead
@@ -29,7 +31,9 @@ import com.google.common.util.concurrent.ListenableFuture
 class AutoLibraryService : MediaLibraryService() {
   companion object {
     private const val ROOT = "root"
-    private val tabs = listOf("continue" to "Continue listening", "following" to "Following")
+    // The tabs if the app's JS doesn't say (it didn't start in time): the ones
+    // everybody has.
+    private val defaultTabs = listOf("continue" to "Continue listening", "following" to "Following")
   }
 
   // Stands in until the app has played something; never loads anything.
@@ -111,12 +115,28 @@ class AutoLibraryService : MediaLibraryService() {
       pageSize: Int,
       params: LibraryParams?
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
-      if (parentId == ROOT) {
-        val items = tabs.map { (id, title) -> AutoBridge.browsableItem(id, title) }
-        return Futures.immediateFuture(LibraryResult.ofItemList(items, params))
-      }
+      if (parentId == ROOT) return tabs(params)
       return AutoBridge.browse(this@AutoLibraryService, parentId)
     }
+
+    // The tabs as plain folders; signed out, the error saying so.
+    private fun tabs(params: LibraryParams?): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> =
+      Futures.transform(
+        AutoBridge.browse(this@AutoLibraryService, ROOT),
+        { result ->
+          val items = result.value
+          when {
+            result.resultCode == SessionError.ERROR_SESSION_AUTHENTICATION_EXPIRED -> result
+            result.resultCode == LibraryResult.RESULT_SUCCESS && !items.isNullOrEmpty() ->
+              LibraryResult.ofItemList(
+                items.map { AutoBridge.browsableItem(it.mediaId, it.mediaMetadata.title?.toString().orEmpty()) },
+                params
+              )
+            else -> LibraryResult.ofItemList(defaultTabs.map { (id, title) -> AutoBridge.browsableItem(id, title) }, params)
+          }
+        },
+        MoreExecutors.directExecutor()
+      )
 
     override fun onGetItem(
       session: MediaLibrarySession,
